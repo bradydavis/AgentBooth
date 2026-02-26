@@ -1,0 +1,36 @@
+# Environment files — never commit secrets
+.env
+.env.local
+.env.*.local
+.env.production
+
+# Dependencies
+node_modules/
+
+# Next.js
+frontend/.next/
+frontend/out/
+
+# Build output
+dist/
+build/
+
+# Drizzle migrations (generated — regenerate from schema)
+frontend/lib/db/migrations/*.sql
+frontend/lib/db/migrations/meta/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp
+
+# Logs
+*.log
+npm-debug.log*
+
+# TypeScript
+*.tsbuildinfo
