@@ -21,7 +21,7 @@ export default async function DashboardPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Your PhoneBooth</h1>
+          <h1 className="text-3xl font-bold text-slate-900">Your AgentBooth</h1>
           <p className="text-slate-500 mt-1">
             {user.tier === 'free'
               ? 'Using shared booth — upgrade for dedicated access'

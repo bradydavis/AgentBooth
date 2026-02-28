@@ -1,4 +1,4 @@
-# PhoneBooth - Frontend Application
+# AgentBooth - Frontend Application
 
 ## Agent Assignment
 **Agent 2: Frontend Application**
@@ -99,7 +99,7 @@ DATABASE_URL=postgresql://...
 UPSTASH_REDIS_REST_URL=https://...
 UPSTASH_REDIS_REST_TOKEN=...
 
-NEXT_PUBLIC_WEBSOCKET_URL=wss://phonebooth-ws.railway.app
+NEXT_PUBLIC_WEBSOCKET_URL=wss://agentbooth-ws.railway.app
 ```
 
 ## Authentication Setup
@@ -462,7 +462,7 @@ export default async function DashboardPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold">🚪 PhoneBooth</h1>
+        <h1 className="text-3xl font-bold">🚪 AgentBooth</h1>
         {!hasDedicatedBooth && (
           <Link href="/upgrade">
             <Button>Upgrade to Pro</Button>

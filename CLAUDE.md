@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Status
 
-PhoneBooth is currently in the **documentation and specification phase** — no source code has been implemented yet. All architecture decisions are documented in `docs/`. Before implementing anything, read:
+AgentBooth is currently in the **documentation and specification phase** — no source code has been implemented yet. All architecture decisions are documented in `docs/`. Before implementing anything, read:
 
 1. `docs/00-PROJECT-OVERVIEW.md` — Business model and product concept
 2. `docs/01-ARCHITECTURE.md` — System design and data flows
@@ -12,7 +12,7 @@ PhoneBooth is currently in the **documentation and specification phase** — no 
 
 ## Architecture Overview
 
-PhoneBooth is a **cloud-based phone booth service for AI agents** — agents queue up to make real phone calls through a shared or dedicated phone number.
+AgentBooth is a **cloud-based phone booth service for AI agents** — agents queue up to make real phone calls through a shared or dedicated phone number.
 
 The system has **7 independent components** assigned to a parallel agent team:
 
@@ -34,7 +34,7 @@ The system has **7 independent components** assigned to a parallel agent team:
 
 ## Core Data Flow
 
-**Call request:** Agent → MCP tool (`phonebooth_call`) → Redis FIFO queue → WebSocket server → Twilio outbound call
+**Call request:** Agent → MCP tool (`agentbooth_call`) → Redis FIFO queue → WebSocket server → Twilio outbound call
 
 **Audio pipeline:** Twilio (mulaw) → WebSocket → PCM → Deepgram (STT) → transcript → Agent → ElevenLabs (TTS) → PCM → mulaw → Twilio
 

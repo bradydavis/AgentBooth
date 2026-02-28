@@ -67,15 +67,30 @@ export function createServer() {
 
   const httpServer = createHttpServer(app);
 
-  // WebSocket for Twilio Media Streams
-  const mediaWss = new WebSocketServer({ server: httpServer, path: '/media' });
+  // WebSocket servers — use noServer mode so we can route by path prefix
+  const mediaWss = new WebSocketServer({ noServer: true });
   const twilioHandler = new TwilioHandler(callManager);
   twilioHandler.attach(mediaWss);
 
-  // WebSocket for browser dashboard
-  const dashboardWss = new WebSocketServer({ server: httpServer, path: '/dashboard' });
+  const dashboardWss = new WebSocketServer({ noServer: true });
   const dashboardHandler = new DashboardHandler();
   dashboardHandler.attach(dashboardWss);
+
+  // Manually route WebSocket upgrades based on URL prefix
+  httpServer.on('upgrade', (req, socket, head) => {
+    const url = req.url ?? '';
+    if (url.startsWith('/media')) {
+      mediaWss.handleUpgrade(req, socket, head, (ws) => {
+        mediaWss.emit('connection', ws, req);
+      });
+    } else if (url.startsWith('/dashboard')) {
+      dashboardWss.handleUpgrade(req, socket, head, (ws) => {
+        dashboardWss.emit('connection', ws, req);
+      });
+    } else {
+      socket.destroy();
+    }
+  });
 
   return { httpServer, callManager };
 }

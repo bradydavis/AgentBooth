@@ -1,4 +1,4 @@
-# PhoneBooth - Deployment Guide
+# AgentBooth - Deployment Guide
 
 ## Complete Deployment Checklist
 

@@ -1,4 +1,4 @@
-# PhoneBooth - Redis Queue Management
+# AgentBooth - Redis Queue Management
 
 ## Agent Assignment
 **Agent 4: Queue Management**

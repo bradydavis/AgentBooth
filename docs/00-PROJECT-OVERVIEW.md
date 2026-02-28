@@ -1,7 +1,7 @@
-# PhoneBooth - Project Overview
+# AgentBooth - Project Overview
 
 ## Concept
-PhoneBooth is a cloud-based "phone booth" service for AI agents. Agents queue up to use a shared phone number (freemium) or get their own dedicated booth with a private number (paid tier).
+AgentBooth is a cloud-based "phone booth" service for AI agents. Agents queue up to use a shared phone number (freemium) or get their own dedicated booth with a private number (paid tier).
 
 ## Core Value Proposition
 - **For Free Users**: Share a phone booth, wait in queue, experience the product
@@ -55,7 +55,7 @@ Think of it like a real phone booth - in the free tier, multiple people (AI agen
 1. Sign up with email (Clerk handles this)
 2. View shared booth dashboard - see the booth status and queue
 3. Configure their AI agent with MCP credentials
-4. Agent calls `phonebooth_call` MCP tool with phone number
+4. Agent calls `agentbooth_call` MCP tool with phone number
 5. Agent is added to queue - see position and estimated wait time
 6. When booth becomes free, agent's call starts automatically
 7. User sees live transcript in dashboard as call progresses
@@ -66,7 +66,7 @@ Think of it like a real phone booth - in the free tier, multiple people (AI agen
 1. User upgrades to Pro tier ($39/mo via Stripe)
 2. Dedicated booth is provisioned with new Twilio number
 3. User gets their own phone number displayed in dashboard
-4. Agent calls `phonebooth_call` MCP tool
+4. Agent calls `agentbooth_call` MCP tool
 5. Call starts immediately - no queue, no waiting
 6. Full call history and analytics available
 7. Can configure booth settings (max duration, voice, etc.)
@@ -134,7 +134,7 @@ Think of it like a real phone booth - in the free tier, multiple people (AI agen
 
 ### Week 5: Queue & MCP
 - Implement Redis-based queue system
-- Build MCP server with phonebooth_call tool
+- Build MCP server with agentbooth_call tool
 - Test agent integration
 - Implement queue processing logic
 
@@ -200,7 +200,7 @@ After individual components are built, agents will need to coordinate on:
 ## Repository Structure
 
 ```
-phonebooth/
+agentbooth/
 ├── docs/                      # Documentation for agent teams
 │   ├── 00-PROJECT-OVERVIEW.md
 │   ├── 01-ARCHITECTURE.md
@@ -281,7 +281,7 @@ For agents working on this project:
 
 The MVP is complete when:
 - ✅ A user can sign up and see the shared booth dashboard
-- ✅ An AI agent can call `phonebooth_call` and get queued
+- ✅ An AI agent can call `agentbooth_call` and get queued
 - ✅ Calls are processed in order (FIFO queue)
 - ✅ Users see live transcripts during calls
 - ✅ Call recordings are saved and accessible

@@ -1,5 +1,5 @@
 {
-  "name": "phonebooth-mcp",
+  "name": "agentbooth-mcp",
   "version": "1.0.0",
   "private": true,
   "type": "module",
@@ -10,14 +10,20 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@coinbase/cdp-agentkit-core": "^0.0.14",
+    "@coinbase/cdp-langchain": "^0.0.15",
+    "@langchain/core": "^1.1.28",
+    "@langchain/langgraph": "^1.1.5",
+    "@langchain/openai": "^1.2.10",
     "@modelcontextprotocol/sdk": "^0.6.0",
-    "@upstash/redis": "^1.28.0",
     "@neondatabase/serverless": "^0.9.0",
+    "@upstash/redis": "^1.28.0",
+    "dotenv": "^17.3.1",
     "drizzle-orm": "^0.30.0"
   },
   "devDependencies": {
-    "typescript": "^5.3.3",
     "@types/node": "^20.11.5",
-    "tsx": "^4.7.0"
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
   }
 }

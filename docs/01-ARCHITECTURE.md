@@ -1,4 +1,4 @@
-# PhoneBooth - System Architecture
+# AgentBooth - System Architecture
 
 ## High-Level Architecture Diagram
 
@@ -42,7 +42,7 @@
                             ┌─────────────────────────────┴────┐
                             │   MCP Server (Railway)            │
                             │   ┌───────────────────────────┐   │
-                            │   │  Tool: phonebooth_call    │   │
+                            │   │  Tool: agentbooth_call    │   │
                             │   │  - Validate requests      │   │
                             │   │  - Queue management       │   │
                             │   └───────────────────────────┘   │
@@ -163,9 +163,9 @@
 - Manage UI
 
 **MCP Tools Exposed**:
-- `phonebooth_call` - Initiate a call
-- `phonebooth_status` - Check call/queue status
-- `phonebooth_cancel` - Remove from queue
+- `agentbooth_call` - Initiate a call
+- `agentbooth_status` - Check call/queue status
+- `agentbooth_cancel` - Remove from queue
 
 ### 4. Upstash Redis (Queue & State Management)
 
@@ -229,7 +229,7 @@ subscriptions (id, user_id, stripe_subscription_id, status, plan_id)
 ```
 AI Agent → MCP Client → MCP Server
 ──────────────────────────────────
-Tool: phonebooth_call
+Tool: agentbooth_call
 Input:
 {
   "phone_number": "+1234567890",
@@ -319,7 +319,7 @@ WebSocket Server receives trigger from Queue Manager
    {
      "To": "+1234567890",
      "From": "{booth_twilio_number}",
-     "Url": "https://phonebooth-ws.railway.app/twiml/{callId}"
+     "Url": "https://agentbooth-ws.railway.app/twiml/{callId}"
    }
 
 2. Twilio calls our webhook URL:
@@ -328,7 +328,7 @@ WebSocket Server receives trigger from Queue Manager
 3. We respond with TwiML:
    <Response>
      <Connect>
-       <Stream url="wss://phonebooth-ws.railway.app/media/{callId}" />
+       <Stream url="wss://agentbooth-ws.railway.app/media/{callId}" />
      </Connect>
    </Response>
 
@@ -551,7 +551,7 @@ Response:
 POST {agent_webhook_url}
 Headers:
   Content-Type: application/json
-  X-PhoneBooth-Signature: {hmac_signature}
+  X-AgentBooth-Signature: {hmac_signature}
 Body:
 {
   call_id: string;
@@ -642,7 +642,7 @@ Header: Authorization: Bearer {INTERNAL_API_KEY}
 WebSocket Server → Agent Webhook
 ─────────────────────────────────
 HMAC signature in header
-X-PhoneBooth-Signature: sha256=...
+X-AgentBooth-Signature: sha256=...
 Agent verifies signature using shared secret
 ```
 

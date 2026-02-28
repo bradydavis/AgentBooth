@@ -8,7 +8,14 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { userId } = auth();
+  let { userId } = auth();
+  
+  // Hack: Mock user for local dev without Clerk keys
+  if (!userId && process.env.NODE_ENV === 'development') {
+    userId = 'user_test123'; // Matches seed data
+  }
+
+  // If still no user, redirect
   if (!userId) redirect('/sign-in');
 
   return (

@@ -1,4 +1,4 @@
-# PhoneBooth - Voice Pipeline
+# AgentBooth - Voice Pipeline
 
 ## Agent Assignment
 **Agent 6: Voice Pipeline**

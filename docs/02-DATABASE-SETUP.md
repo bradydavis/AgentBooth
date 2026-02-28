@@ -1,10 +1,10 @@
-# PhoneBooth - Database Setup (Neon Postgres)
+# AgentBooth - Database Setup (Neon Postgres)
 
 ## Agent Assignment
 **Agent 1: Database & Backend Setup**
 
 ## Overview
-Set up the Neon Postgres database with schema for users, booths, calls, and billing. This is the persistent storage layer for PhoneBooth.
+Set up the Neon Postgres database with schema for users, booths, calls, and billing. This is the persistent storage layer for AgentBooth.
 
 ## Dependencies
 - ✅ Neon account (no external services needed)
@@ -21,7 +21,7 @@ Set up the Neon Postgres database with schema for users, booths, calls, and bill
 
 ```bash
 # Go to neon.tech and create a new project
-# Name: phonebooth-production
+# Name: agentbooth-production
 # Region: Choose closest to your users (us-east-1 recommended)
 
 # Get connection string from Neon dashboard:
@@ -513,7 +513,7 @@ export async function seedDatabase() {
   // Create test user
   const [testUser] = await db.insert(users).values({
     clerkUserId: 'user_test123',
-    email: 'test@phonebooth.app',
+    email: 'test@agentbooth.app',
     tier: 'free',
   }).returning();
   

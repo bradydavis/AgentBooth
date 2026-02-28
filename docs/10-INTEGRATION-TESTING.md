@@ -1,4 +1,4 @@
-# PhoneBooth - Integration Testing
+# AgentBooth - Integration Testing
 
 ## End-to-End Test Scenarios
 
@@ -62,10 +62,10 @@ describe('Booth API', () => {
 
 ### MCP Tests
 ```typescript
-// tests/mcp/phonebooth_call.test.ts
-describe('phonebooth_call tool', () => {
+// tests/mcp/agentbooth_call.test.ts
+describe('agentbooth_call tool', () => {
   it('should queue a call request', async () => {
-    const result = await mcpClient.callTool('phonebooth_call', {
+    const result = await mcpClient.callTool('agentbooth_call', {
       phone_number: '+1234567890',
       context: 'Test call'
     });
@@ -97,7 +97,7 @@ describe('Twilio WebSocket', () => {
 ```bash
 # Test queue with 100 concurrent agents
 artillery quick --count 100 --num 1 \
-  http://localhost:3000/api/mcp/phonebooth_call
+  http://localhost:3000/api/mcp/agentbooth_call
 ```
 
 ## Acceptance Criteria

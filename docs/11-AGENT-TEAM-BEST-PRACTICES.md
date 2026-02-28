@@ -1,7 +1,7 @@
-# Building PhoneBooth with Agent Teams - Best Practices
+# Building AgentBooth with Agent Teams - Best Practices
 
 ## Overview
-This guide contains best practices for coordinating multiple AI agents to build PhoneBooth efficiently.
+This guide contains best practices for coordinating multiple AI agents to build AgentBooth efficiently.
 
 ## Team Structure & Workflow
 
@@ -282,4 +282,4 @@ Test with realistic load:
 
 Remember: The goal is a working MVP, not perfect code. Ship it, learn from users, iterate.
 
-Good luck building PhoneBooth! 🚀
+Good luck building AgentBooth! 🚀

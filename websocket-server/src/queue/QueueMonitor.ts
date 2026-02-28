@@ -1,4 +1,4 @@
-import { Redis } from '@upstash/redis';
+import { redis } from '../utils/redis';
 import { logger } from '../utils/logger';
 
 const POLL_INTERVAL_MS = 5000;
@@ -9,15 +9,11 @@ const FREE_BOOTH_ID = 'free-booth-1'; // Matches seed data
  * Uses distributed locking to prevent duplicate processing across server instances.
  */
 export class QueueMonitor {
-  private redis: Redis;
   private interval: NodeJS.Timeout | null = null;
   private processing = false;
 
   constructor() {
-    this.redis = new Redis({
-      url: process.env.UPSTASH_REDIS_REST_URL!,
-      token: process.env.UPSTASH_REDIS_REST_TOKEN!,
-    });
+    // Redis client initialized in utils/redis.ts
   }
 
   start() {
@@ -51,14 +47,33 @@ export class QueueMonitor {
     const lockKey = `booth:${boothId}:lock`;
     const lockVal = `${Date.now()}-${Math.random()}`;
 
-    const acquired = await this.redis.set(lockKey, lockVal, { nx: true, ex: 10 });
-    if (!acquired) return;
+    // Use set with NX option via ioredis or upstash adapter
+    // Note: API differs slightly. Using generic set for compatibility or handling specific impl.
+    // Upstash: set(key, value, { nx: true, ex: 10 })
+    // IORedis: set(key, value, 'NX', 'EX', 10)
+    
+    let acquired;
+    // @ts-ignore
+    if (redis.setnx) {
+      // IORedis
+      // @ts-ignore
+      acquired = await redis.set(lockKey, lockVal, 'NX', 'EX', 10);
+    } else {
+      // Upstash
+      // @ts-ignore
+      acquired = await redis.set(lockKey, lockVal, { nx: true, ex: 10 });
+    }
+
+    if (!acquired || acquired !== 'OK') {
+        // IORedis returns 'OK' on success, null on failure. Upstash returns string or null?
+        if (acquired !== 'OK' && acquired !== 1 && acquired !== true) return;
+    }
 
     try {
-      const status = await this.redis.hget(`booth:${boothId}:state`, 'status');
+      const status = await redis.hget(`booth:${boothId}:state`, 'status');
       if (status !== 'idle' && status !== null) return;
 
-      const itemStr = await this.redis.rpop(`booth:${boothId}:queue`) as string | null;
+      const itemStr = await redis.rpop(`booth:${boothId}:queue`) as string | null;
       if (!itemStr) return;
 
       const item = JSON.parse(itemStr) as {
@@ -70,7 +85,7 @@ export class QueueMonitor {
       };
 
       // Mark booth as occupied
-      await this.redis.hset(`booth:${boothId}:state`, {
+      await redis.hset(`booth:${boothId}:state`, {
         status: 'occupied',
         currentCallId: item.callId,
         currentAgent: item.agentId,
@@ -79,6 +94,7 @@ export class QueueMonitor {
 
       // Trigger the WebSocket server's own initiate-call endpoint
       const baseUrl = process.env.PUBLIC_URL ?? 'http://localhost:3001';
+      // Use internal fetch
       await fetch(`${baseUrl}/api/initiate-call`, {
         method: 'POST',
         headers: {
@@ -89,9 +105,11 @@ export class QueueMonitor {
       });
 
       logger.info(`Triggered call ${item.callId} for booth ${boothId}`);
+    } catch (e) {
+        logger.error('Error processing queue item', e);
     } finally {
-      const current = await this.redis.get(lockKey);
-      if (current === lockVal) await this.redis.del(lockKey);
+      const current = await redis.get(lockKey);
+      if (current === lockVal) await redis.del(lockKey);
     }
   }
 }

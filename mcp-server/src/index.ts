@@ -11,17 +11,17 @@ import { resolveUserAndBooth } from './auth/apiKeyAuth.js';
 const queueManager = new QueueManager();
 
 const server = new Server(
-  { name: 'phonebooth-mcp', version: '1.0.0' },
+  { name: 'agentbooth-mcp', version: '1.0.0' },
   { capabilities: { tools: {} } }
 );
 
 server.setRequestHandler(ListToolsRequestSchema, async () => ({
   tools: [
     {
-      name: 'phonebooth_call',
+      name: 'agentbooth_call',
       description:
-        'Make a phone call through PhoneBooth. The call is queued and processed in order. ' +
-        'Returns a call_id and queue position. Use phonebooth_status to check progress.',
+        'Make a phone call through AgentBooth. The call is queued and processed in order. ' +
+        'Returns a call_id and queue position. Use agentbooth_status to check progress.',
       inputSchema: {
         type: 'object',
         properties: {
@@ -49,7 +49,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
       },
     },
     {
-      name: 'phonebooth_status',
+      name: 'agentbooth_status',
       description: 'Check the status of your current call or queue position.',
       inputSchema: {
         type: 'object',
@@ -57,14 +57,14 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
       },
     },
     {
-      name: 'phonebooth_cancel',
+      name: 'agentbooth_cancel',
       description: 'Cancel a queued call before it starts.',
       inputSchema: {
         type: 'object',
         properties: {
           call_id: {
             type: 'string',
-            description: 'The call_id returned by phonebooth_call',
+            description: 'The call_id returned by agentbooth_call',
           },
         },
         required: ['call_id'],
@@ -81,22 +81,22 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   // For stdio transport: the PHONEBOOTH_API_KEY env var is set by the agent's config.
   const apiKey = process.env.PHONEBOOTH_API_KEY;
   if (!apiKey) {
-    return errorResult('PHONEBOOTH_API_KEY environment variable not set. Configure your MCP client with your PhoneBooth API key.');
+    return errorResult('PHONEBOOTH_API_KEY environment variable not set. Configure your MCP client with your AgentBooth API key.');
   }
 
   let auth: { userId: string; boothId: string; tier: string };
   try {
     auth = await resolveUserAndBooth(apiKey);
   } catch {
-    return errorResult('Invalid API key. Generate one at phonebooth.app/dashboard/settings');
+    return errorResult('Invalid API key. Generate one at agentbooth.app/dashboard/settings');
   }
 
   switch (name) {
-    case 'phonebooth_call':
+    case 'agentbooth_call':
       return handleCall(auth, args as Record<string, unknown>);
-    case 'phonebooth_status':
+    case 'agentbooth_status':
       return handleStatus(auth);
-    case 'phonebooth_cancel':
+    case 'agentbooth_cancel':
       return handleCancel(auth, args as Record<string, unknown>);
     default:
       return errorResult(`Unknown tool: ${name}`);
@@ -198,7 +198,7 @@ function errorResult(message: string) {
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error('PhoneBooth MCP server running (stdio)');
+  console.error('AgentBooth MCP server running (stdio)');
 }
 
 main().catch((err) => {

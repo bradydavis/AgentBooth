@@ -1,6 +1,10 @@
+import 'dotenv/config';
 import { createServer } from './server';
 import { QueueMonitor } from './queue/QueueMonitor';
 import { logger } from './utils/logger';
+import path from 'path';
+
+require('dotenv').config({ path: path.resolve(process.cwd(), '.env.local') });
 
 const PORT = parseInt(process.env.PORT ?? '3001', 10);
 

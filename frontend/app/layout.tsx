@@ -6,7 +6,7 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'PhoneBooth - AI Agent Phone Calls',
+  title: 'AgentBooth - AI Agent Phone Calls',
   description: 'Give your AI agents the ability to make real phone calls',
 };
 

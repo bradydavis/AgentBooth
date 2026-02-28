@@ -1,4 +1,4 @@
-# PhoneBooth - MCP Server
+# AgentBooth - MCP Server
 
 ## Agent Assignment
 **Agent 5: MCP Server**
@@ -13,12 +13,12 @@ Implement the MCP (Model Context Protocol) server that exposes tools for AI agen
 
 ## MCP Tools
 
-### 1. phonebooth_call
+### 1. agentbooth_call
 
 ```typescript
 {
-  name: "phonebooth_call",
-  description: "Make a phone call through PhoneBooth",
+  name: "agentbooth_call",
+  description: "Make a phone call through AgentBooth",
   inputSchema: {
     type: "object",
     properties: {
@@ -40,11 +40,11 @@ Implement the MCP (Model Context Protocol) server that exposes tools for AI agen
 }
 ```
 
-### 2. phonebooth_status
+### 2. agentbooth_status
 
 ```typescript
 {
-  name: "phonebooth_status",
+  name: "agentbooth_status",
   description: "Check your call status or queue position",
   inputSchema: {
     type: "object",
@@ -53,11 +53,11 @@ Implement the MCP (Model Context Protocol) server that exposes tools for AI agen
 }
 ```
 
-### 3. phonebooth_cancel
+### 3. agentbooth_cancel
 
 ```typescript
 {
-  name: "phonebooth_cancel",
+  name: "agentbooth_cancel",
   description: "Cancel your queued call",
   inputSchema: {
     type: "object",
@@ -87,7 +87,7 @@ import { validatePhoneNumber } from './utils/validation.js';
 
 const server = new Server(
   {
-    name: 'phonebooth-mcp',
+    name: 'agentbooth-mcp',
     version: '1.0.0',
   },
   {
@@ -104,8 +104,8 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
   return {
     tools: [
       {
-        name: 'phonebooth_call',
-        description: 'Make a phone call through PhoneBooth',
+        name: 'agentbooth_call',
+        description: 'Make a phone call through AgentBooth',
         inputSchema: {
           type: 'object',
           properties: {
@@ -126,7 +126,7 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
         }
       },
       {
-        name: 'phonebooth_status',
+        name: 'agentbooth_status',
         description: 'Check call status or queue position',
         inputSchema: {
           type: 'object',
@@ -142,16 +142,16 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   const { name, arguments: args } = request.params;
   
   switch (name) {
-    case 'phonebooth_call':
-      return await handlePhoneBoothCall(args);
-    case 'phonebooth_status':
+    case 'agentbooth_call':
+      return await handleAgentBoothCall(args);
+    case 'agentbooth_status':
       return await handleStatus(args);
     default:
       throw new Error(`Unknown tool: ${name}`);
   }
 });
 
-async function handlePhoneBoothCall(args: any) {
+async function handleAgentBoothCall(args: any) {
   // Validate inputs
   const phoneNumber = args.phone_number;
   if (!validatePhoneNumber(phoneNumber)) {
@@ -223,7 +223,7 @@ async function handleStatus(args: any) {
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error('PhoneBooth MCP server running');
+  console.error('AgentBooth MCP server running');
 }
 
 main().catch(console.error);
@@ -273,7 +273,7 @@ export function validateContext(context: string): boolean {
 
 ## Acceptance Criteria
 
-- ✅ MCP server exposes phonebooth_call tool
+- ✅ MCP server exposes agentbooth_call tool
 - ✅ API key authentication working
 - ✅ Phone number validation
 - ✅ Queue integration

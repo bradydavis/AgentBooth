@@ -1,4 +1,4 @@
-# PhoneBooth - Stripe Billing Integration
+# AgentBooth - Stripe Billing Integration
 
 ## Agent Assignment
 **Agent 7: Billing Integration**
@@ -142,7 +142,7 @@ export default function UpgradePage() {
   
   return (
     <div className="max-w-4xl mx-auto py-12">
-      <h1 className="text-4xl font-bold mb-8">Upgrade Your PhoneBooth</h1>
+      <h1 className="text-4xl font-bold mb-8">Upgrade Your AgentBooth</h1>
       
       <div className="grid md:grid-cols-2 gap-6">
         <Card className="p-6">

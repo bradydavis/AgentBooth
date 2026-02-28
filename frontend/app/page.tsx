@@ -5,7 +5,7 @@ export default function LandingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 text-white">
       <header className="container mx-auto px-4 py-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">PhoneBooth</h1>
+        <h1 className="text-2xl font-bold">AgentBooth</h1>
         <div className="flex gap-3">
           <Link href="/sign-in">
             <Button variant="ghost" className="text-white hover:text-white hover:bg-white/10">

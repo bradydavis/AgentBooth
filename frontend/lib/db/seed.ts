@@ -6,7 +6,7 @@ async function seedDatabase() {
 
   const [testUser] = await db.insert(users).values({
     clerkUserId: 'user_test123',
-    email: 'test@phonebooth.app',
+    email: 'test@agentbooth.app',
     tier: 'free',
   }).returning();
 

@@ -1,17 +1,17 @@
 import { CallSession } from './CallSession';
 import { SttClient } from '../integrations/SttClient';
-import { ElevenLabsClient } from '../integrations/ElevenLabsClient';
+import { SmallestTtsClient } from '../integrations/SmallestTtsClient';
 import { AudioConverter } from '../audio/AudioConverter';
 import { redis } from '../utils/redis';
 import { logger } from '../utils/logger';
 
 export class CallOrchestrator {
   private stt: SttClient;
-  private tts: ElevenLabsClient;
+  private tts: SmallestTtsClient;
 
   constructor() {
     this.stt = new SttClient();
-    this.tts = new ElevenLabsClient();
+    this.tts = new SmallestTtsClient();
   }
 
   async setupCall(session: CallSession): Promise<void> {
@@ -24,6 +24,12 @@ export class CallOrchestrator {
     });
 
     logger.info(`Call ${session.callId} pipeline ready`);
+
+    // Speak an opening greeting immediately on connect
+    const greeting = session.context
+      ? `Hello! This is Leo. How can I help you today?`
+      : `Hello! You've reached AgentBooth. How can I help you?`;
+    await this.speakResponse(session, greeting);
   }
 
   async handleInboundAudio(session: CallSession, mulawBase64: string): Promise<void> {
@@ -60,7 +66,7 @@ export class CallOrchestrator {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'X-PhoneBooth-Call-Id': session.callId,
+          'X-AgentBooth-Call-Id': session.callId,
         },
         body: JSON.stringify({
           call_id: session.callId,
@@ -95,16 +101,31 @@ export class CallOrchestrator {
 
     try {
       const pcmStream = this.tts.textToSpeechStream(text);
+      let chunkCount = 0;
+
+      // Twilio expects audio in small 20ms chunks (160 bytes at 8kHz mulaw)
+      const MULAW_CHUNK_SIZE = 160;
 
       for await (const pcmChunk of pcmStream) {
-        if (!session.twilioWs || session.twilioWs.readyState !== 1) break;
-        const mulawChunk = AudioConverter.pcmToMulaw(pcmChunk);
-        session.twilioWs.send(JSON.stringify({
-          event: 'media',
-          streamSid: session.streamSid,
-          media: { payload: mulawChunk.toString('base64') },
-        }));
+        if (!session.twilioWs || session.twilioWs.readyState !== 1) {
+          logger.warn('TTS: Twilio WebSocket not ready, stopping');
+          break;
+        }
+        const mulawFull = AudioConverter.pcmToMulaw(pcmChunk);
+        chunkCount++;
+
+        // Split into 20ms slices and send each one
+        for (let offset = 0; offset < mulawFull.length; offset += MULAW_CHUNK_SIZE) {
+          if (!session.twilioWs || session.twilioWs.readyState !== 1) break;
+          const slice = mulawFull.slice(offset, offset + MULAW_CHUNK_SIZE);
+          session.twilioWs.send(JSON.stringify({
+            event: 'media',
+            streamSid: session.streamSid,
+            media: { payload: slice.toString('base64') },
+          }));
+        }
       }
+      logger.info(`TTS: done speaking "${text.slice(0, 40)}..." (${chunkCount} TTS responses, ${MULAW_CHUNK_SIZE}b chunks)`);
     } catch (err) {
       logger.error('TTS error', err);
     } finally {

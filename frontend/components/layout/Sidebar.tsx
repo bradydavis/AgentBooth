@@ -17,7 +17,7 @@ export function Sidebar() {
   return (
     <aside className="w-56 border-r bg-white flex flex-col">
       <div className="p-6 border-b">
-        <h1 className="font-bold text-lg">PhoneBooth</h1>
+        <h1 className="font-bold text-lg">AgentBooth</h1>
       </div>
       <nav className="flex-1 p-4 space-y-1">
         {navItems.map((item) => (

@@ -1,8 +1,8 @@
-# PhoneBooth - Agent Team Documentation
+# AgentBooth - Agent Team Documentation
 
 ## 📋 Complete Documentation Set for Building with Claude Code Agent Teams
 
-This directory contains comprehensive documentation for building PhoneBooth, a cloud-based phone booth service for AI agents.
+This directory contains comprehensive documentation for building AgentBooth, a cloud-based phone booth service for AI agents.
 
 ## 📁 Documentation Files
 
@@ -200,7 +200,7 @@ If stuck:
 
 ## 🎉 Let's Build!
 
-You now have everything you need to build PhoneBooth with agent teams. Each document is optimized for AI agents to read and implement independently while coordinating on integration points.
+You now have everything you need to build AgentBooth with agent teams. Each document is optimized for AI agents to read and implement independently while coordinating on integration points.
 
 Remember: Ship fast, learn from users, iterate! 🚀
 

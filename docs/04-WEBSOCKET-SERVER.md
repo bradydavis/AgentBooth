@@ -1,4 +1,4 @@
-# PhoneBooth - WebSocket Audio Server
+# AgentBooth - WebSocket Audio Server
 
 ## Agent Assignment
 **Agent 3: WebSocket Audio Server**
@@ -423,7 +423,7 @@ CMD ["node", "dist/index.js"]
 ```json
 // package.json
 {
-  "name": "phonebooth-websocket",
+  "name": "agentbooth-websocket",
   "version": "1.0.0",
   "scripts": {
     "dev": "tsx watch src/index.ts",
