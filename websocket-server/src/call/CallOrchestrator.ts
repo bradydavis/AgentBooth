@@ -1,6 +1,7 @@
 import { CallSession } from './CallSession';
 import { SttClient } from '../integrations/SttClient';
 import { SmallestTtsClient } from '../integrations/SmallestTtsClient';
+import { LlmClient } from '../integrations/LlmClient';
 import { AudioConverter } from '../audio/AudioConverter';
 import { redis } from '../utils/redis';
 import { logger } from '../utils/logger';
@@ -8,10 +9,12 @@ import { logger } from '../utils/logger';
 export class CallOrchestrator {
   private stt: SttClient;
   private tts: SmallestTtsClient;
+  private llm: LlmClient;
 
   constructor() {
     this.stt = new SttClient();
     this.tts = new SmallestTtsClient();
+    this.llm = new LlmClient();
   }
 
   async setupCall(session: CallSession): Promise<void> {
@@ -57,8 +60,20 @@ export class CallOrchestrator {
 
   private async getAgentResponse(session: CallSession, transcript: string): Promise<string> {
     if (!session.webhookUrl) {
-      // Default echo response when no webhook configured
-      return `I received your message: "${transcript}". How can I help you further?`;
+      // No webhook — use Claude directly for intelligent responses
+      try {
+        logger.info(`[LLM] Getting Claude response for: "${transcript.slice(0, 50)}..."`);
+        const response = await this.llm.getResponse(
+          transcript,
+          session.transcript,
+          session.context
+        );
+        logger.info(`[LLM] Claude responded: "${response.slice(0, 60)}..."`);
+        return response;
+      } catch (err) {
+        logger.error('[LLM] Claude error', err);
+        return "I'm sorry, I had trouble with that. Could you say it again?";
+      }
     }
 
     try {
