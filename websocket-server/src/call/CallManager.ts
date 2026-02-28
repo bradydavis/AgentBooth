@@ -19,13 +19,22 @@ export class CallManager {
     const accountSid = process.env.TWILIO_ACCOUNT_SID;
     const apiKeySid = process.env.TWILIO_API_KEY_SID;
     const apiKeySecret = process.env.TWILIO_API_KEY_SECRET;
+    const authToken = process.env.TWILIO_AUTH_TOKEN;
 
-    if (!accountSid || !apiKeySid || !apiKeySecret) {
-      logger.error('Missing Twilio credentials (API Key SID/Secret + Account SID required)');
-      // Fallback for types, but calls will fail
+    if (!accountSid) {
+      logger.error('Missing TWILIO_ACCOUNT_SID');
       this.twilioClient = twilio('AC00000000000000000000000000000000', 'auth_token');
-    } else {
+    } else if (apiKeySid && apiKeySecret) {
+      // API Key auth (preferred)
+      logger.info('Twilio: using API Key auth');
       this.twilioClient = twilio(apiKeySid, apiKeySecret, { accountSid });
+    } else if (authToken) {
+      // Simple auth token fallback
+      logger.info('Twilio: using Auth Token auth');
+      this.twilioClient = twilio(accountSid, authToken);
+    } else {
+      logger.error('Missing Twilio auth — set TWILIO_AUTH_TOKEN or TWILIO_API_KEY_SID + TWILIO_API_KEY_SECRET');
+      this.twilioClient = twilio('AC00000000000000000000000000000000', 'auth_token');
     }
   }
 
