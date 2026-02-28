@@ -1,6 +1,6 @@
 import { db } from './index';
 import { apiKeys, users } from './schema';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import { createHash, randomBytes } from 'crypto';
 
 export function generateApiKey(): { key: string; hash: string; prefix: string } {

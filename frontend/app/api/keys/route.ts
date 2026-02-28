@@ -1,6 +1,6 @@
 import { auth } from '@clerk/nextjs';
 import { NextResponse } from 'next/server';
-import { createApiKey, getUserApiKeys, getUserByClerkId } from '@/lib/db/users';
+import { getUserByClerkId } from '@/lib/db/users';
 
 // This just re-exports from the right modules
 export { GET, POST };

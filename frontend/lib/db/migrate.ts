@@ -3,7 +3,7 @@ import { db } from './index';
 
 async function runMigrations() {
   console.log('Running migrations...');
-  await migrate(db, { migrationsFolder: './lib/db/migrations' });
+  await migrate(db as any, { migrationsFolder: './lib/db/migrations' });
   console.log('Migrations complete');
 }
 
