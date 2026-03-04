@@ -25,6 +25,20 @@ export function createServer() {
     });
   });
 
+  // Debug — check what Twilio env vars Railway loaded (masked)
+  app.get('/debug/env', (_req, res) => {
+    const sid = process.env.TWILIO_ACCOUNT_SID ?? '';
+    const token = process.env.TWILIO_AUTH_TOKEN ?? '';
+    const apiSid = process.env.TWILIO_API_KEY_SID ?? '';
+    res.json({
+      TWILIO_ACCOUNT_SID: sid ? `${sid.slice(0, 6)}...${sid.slice(-4)}` : 'NOT SET',
+      TWILIO_AUTH_TOKEN: token ? `${token.slice(0, 4)}...${token.slice(-4)} (len=${token.length})` : 'NOT SET',
+      TWILIO_API_KEY_SID: apiSid ? `${apiSid.slice(0, 6)}...` : 'NOT SET',
+      TWILIO_PHONE_NUMBER: process.env.TWILIO_PHONE_NUMBER ?? 'NOT SET',
+      PUBLIC_URL: process.env.PUBLIC_URL ?? 'NOT SET',
+    });
+  });
+
   // TwiML webhook — Twilio calls this to get streaming instructions
   app.post('/twiml/:callId', (req, res) => {
     const { callId } = req.params;
