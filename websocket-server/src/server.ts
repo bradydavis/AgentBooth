@@ -34,7 +34,20 @@ export function createServer() {
       const account = await client.api.accounts(accountSid).fetch();
       res.json({ success: true, name: account.friendlyName, status: account.status });
     } catch (err: any) {
-      res.json({ success: false, error: err?.message, code: err?.code });
+      // Dump raw hex of first/last 2 chars to detect hidden characters
+      const sid = process.env.TWILIO_ACCOUNT_SID ?? '';
+      const tok = process.env.TWILIO_AUTH_TOKEN ?? '';
+      res.json({
+        success: false,
+        error: err?.message,
+        code: err?.code,
+        sid_len: sid.length,
+        sid_first4_hex: Buffer.from(sid.slice(0, 4)).toString('hex'),
+        sid_last4_hex: Buffer.from(sid.slice(-4)).toString('hex'),
+        tok_len: tok.length,
+        tok_first4_hex: Buffer.from(tok.slice(0, 4)).toString('hex'),
+        tok_last4_hex: Buffer.from(tok.slice(-4)).toString('hex'),
+      });
     }
   });
 
