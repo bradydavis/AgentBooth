@@ -59,9 +59,13 @@ export function createServer() {
         webhookUrl,
       });
       res.json(result);
-    } catch (err) {
+    } catch (err: any) {
       logger.error('Failed to initiate call', err);
-      res.status(500).json({ error: 'Failed to initiate call' });
+      res.status(500).json({
+        error: 'Failed to initiate call',
+        detail: err?.message ?? String(err),
+        code: err?.code,
+      });
     }
   });
 
