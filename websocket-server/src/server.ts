@@ -25,6 +25,19 @@ export function createServer() {
     });
   });
 
+  // Debug — test Twilio auth directly from Railway
+  app.get('/debug/twilio', async (_req, res) => {
+    try {
+      const accountSid = process.env.TWILIO_ACCOUNT_SID ?? '';
+      const authToken = process.env.TWILIO_AUTH_TOKEN ?? '';
+      const client = twilio(accountSid, authToken);
+      const account = await client.api.accounts(accountSid).fetch();
+      res.json({ success: true, name: account.friendlyName, status: account.status });
+    } catch (err: any) {
+      res.json({ success: false, error: err?.message, code: err?.code });
+    }
+  });
+
   // Debug — check what Twilio env vars Railway loaded (masked)
   app.get('/debug/env', (_req, res) => {
     const sid = process.env.TWILIO_ACCOUNT_SID ?? '';
