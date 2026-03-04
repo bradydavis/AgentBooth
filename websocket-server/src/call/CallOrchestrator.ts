@@ -112,6 +112,7 @@ export class CallOrchestrator {
   private async speakResponse(session: CallSession, text: string): Promise<void> {
     session.isAgentSpeaking = true;
     session.addTranscript('agent', text);
+    logger.info(`[SPEAK] Starting TTS for "${text.slice(0, 60)}..." | streamSid=${session.streamSid} | wsReady=${session.twilioWs?.readyState}`);
 
     // Fire-and-forget — Redis is for dashboard only, never block the call on it
     redis.publish(`booth:${session.boothId}:updates`, JSON.stringify({
@@ -130,25 +131,33 @@ export class CallOrchestrator {
       const MULAW_CHUNK_SIZE = 160;
 
       for await (const pcmChunk of pcmStream) {
+        logger.info(`[SPEAK] Got PCM chunk: ${pcmChunk.length} bytes | wsReady=${session.twilioWs?.readyState} | streamSid=${session.streamSid}`);
         if (!session.twilioWs || session.twilioWs.readyState !== 1) {
-          logger.warn('TTS: Twilio WebSocket not ready, stopping');
+          logger.warn(`[SPEAK] WebSocket not ready (state=${session.twilioWs?.readyState}), aborting`);
           break;
         }
         const mulawFull = AudioConverter.pcmToMulaw(pcmChunk);
         chunkCount++;
+        logger.info(`[SPEAK] Sending ${Math.ceil(mulawFull.length / MULAW_CHUNK_SIZE)} mulaw chunks for streamSid=${session.streamSid}`);
 
         // Split into 20ms slices and send each one
+        let sentChunks = 0;
         for (let offset = 0; offset < mulawFull.length; offset += MULAW_CHUNK_SIZE) {
-          if (!session.twilioWs || session.twilioWs.readyState !== 1) break;
+          if (!session.twilioWs || session.twilioWs.readyState !== 1) {
+            logger.warn(`[SPEAK] WS closed mid-stream after ${sentChunks} chunks`);
+            break;
+          }
           const slice = mulawFull.slice(offset, offset + MULAW_CHUNK_SIZE);
           session.twilioWs.send(JSON.stringify({
             event: 'media',
             streamSid: session.streamSid,
             media: { payload: slice.toString('base64') },
           }));
+          sentChunks++;
         }
+        logger.info(`[SPEAK] Sent ${sentChunks} chunks to Twilio`);
       }
-      logger.info(`TTS: done speaking "${text.slice(0, 40)}..." (${chunkCount} TTS responses, ${MULAW_CHUNK_SIZE}b chunks)`);
+      logger.info(`[SPEAK] Done: "${text.slice(0, 40)}..." (${chunkCount} PCM chunks processed)`);
     } catch (err) {
       logger.error('TTS error', err);
     } finally {

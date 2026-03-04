@@ -29,12 +29,25 @@ export function createServer() {
   app.post('/twiml/:callId', (req, res) => {
     const { callId } = req.params;
     const publicUrl = (process.env.PUBLIC_URL ?? `https://${req.hostname}`).replace(/\/$/, '');
+    const wssUrl = `wss://${publicUrl.replace(/^https?:\/\//, '')}/media/${callId}`;
+
+    logger.info(`TwiML requested for callId: ${callId}, wssUrl: ${wssUrl}`);
 
     const twimlResponse = new twilio.twiml.VoiceResponse();
     const connect = twimlResponse.connect();
-    connect.stream({ url: `wss://${publicUrl.replace(/^https?:\/\//, '')}/media/${callId}` });
+    // both_tracks = bidirectional: Twilio sends caller audio to us AND we can send audio back
+    connect.stream({ url: wssUrl, track: 'both_tracks' as any });
 
-    res.type('text/xml').send(twimlResponse.toString());
+    const xml = twimlResponse.toString();
+    logger.info(`TwiML response: ${xml}`);
+    res.type('text/xml').send(xml);
+  });
+
+  // Status callback endpoint (Twilio was getting 404)
+  app.post('/api/call-status/:callId', (req, res) => {
+    const { callId } = req.params;
+    logger.info(`Call status for ${callId}: ${JSON.stringify(req.body)}`);
+    res.sendStatus(200);
   });
 
   // Internal API — MCP server calls this to initiate a call
