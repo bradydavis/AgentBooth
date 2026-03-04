@@ -25,46 +25,6 @@ export function createServer() {
     });
   });
 
-  // Debug — test Twilio auth directly from Railway
-  app.get('/debug/twilio', async (_req, res) => {
-    try {
-      const accountSid = process.env.TWILIO_ACCOUNT_SID ?? '';
-      const authToken = process.env.TWILIO_AUTH_TOKEN ?? '';
-      const client = twilio(accountSid, authToken);
-      const account = await client.api.accounts(accountSid).fetch();
-      res.json({ success: true, name: account.friendlyName, status: account.status });
-    } catch (err: any) {
-      // Dump raw hex of first/last 2 chars to detect hidden characters
-      const sid = process.env.TWILIO_ACCOUNT_SID ?? '';
-      const tok = process.env.TWILIO_AUTH_TOKEN ?? '';
-      res.json({
-        success: false,
-        error: err?.message,
-        code: err?.code,
-        sid_len: sid.length,
-        sid_first4_hex: Buffer.from(sid.slice(0, 4)).toString('hex'),
-        sid_last4_hex: Buffer.from(sid.slice(-4)).toString('hex'),
-        tok_len: tok.length,
-        tok_first4_hex: Buffer.from(tok.slice(0, 4)).toString('hex'),
-        tok_last4_hex: Buffer.from(tok.slice(-4)).toString('hex'),
-      });
-    }
-  });
-
-  // Debug — check what Twilio env vars Railway loaded (masked)
-  app.get('/debug/env', (_req, res) => {
-    const sid = process.env.TWILIO_ACCOUNT_SID ?? '';
-    const token = process.env.TWILIO_AUTH_TOKEN ?? '';
-    const apiSid = process.env.TWILIO_API_KEY_SID ?? '';
-    res.json({
-      TWILIO_ACCOUNT_SID: sid ? `${sid.slice(0, 6)}...${sid.slice(-4)}` : 'NOT SET',
-      TWILIO_AUTH_TOKEN: token ? `${token.slice(0, 4)}...${token.slice(-4)} (len=${token.length})` : 'NOT SET',
-      TWILIO_API_KEY_SID: apiSid ? `${apiSid.slice(0, 6)}...` : 'NOT SET',
-      TWILIO_PHONE_NUMBER: process.env.TWILIO_PHONE_NUMBER ?? 'NOT SET',
-      PUBLIC_URL: process.env.PUBLIC_URL ?? 'NOT SET',
-    });
-  });
-
   // TwiML webhook — Twilio calls this to get streaming instructions
   app.post('/twiml/:callId', (req, res) => {
     const { callId } = req.params;
@@ -101,11 +61,7 @@ export function createServer() {
       res.json(result);
     } catch (err: any) {
       logger.error('Failed to initiate call', err);
-      res.status(500).json({
-        error: 'Failed to initiate call',
-        detail: err?.message ?? String(err),
-        code: err?.code,
-      });
+      res.status(500).json({ error: 'Failed to initiate call' });
     }
   });
 
