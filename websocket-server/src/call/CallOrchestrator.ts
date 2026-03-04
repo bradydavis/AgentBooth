@@ -18,21 +18,27 @@ export class CallOrchestrator {
   }
 
   async setupCall(session: CallSession): Promise<void> {
-    await this.stt.connect({
+    // Connect STT in the background — never block the greeting on it
+    this.stt.connect({
       onTranscript: async (text, isFinal) => {
         if (!isFinal || !text.trim()) return;
         await this.handleTranscript(session, text);
       },
       onError: (err) => logger.error('STT error', err),
+    }).then(() => {
+      logger.info(`STT connected for call ${session.callId}`);
+    }).catch((err) => {
+      logger.error(`STT connect failed for call ${session.callId} (non-fatal — caller won't be heard)`, err);
     });
 
-    logger.info(`Call ${session.callId} pipeline ready`);
-
-    // Speak an opening greeting immediately on connect
+    // Always speak greeting immediately, regardless of STT status
     const greeting = session.context
       ? `Hello! This is Leo. How can I help you today?`
       : `Hello! You've reached AgentBooth. How can I help you?`;
+
+    logger.info(`Speaking greeting for call ${session.callId}`);
     await this.speakResponse(session, greeting);
+    logger.info(`Greeting sent for call ${session.callId}`);
   }
 
   async handleInboundAudio(session: CallSession, mulawBase64: string): Promise<void> {

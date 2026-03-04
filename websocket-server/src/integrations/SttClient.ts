@@ -33,7 +33,7 @@ export class SttClient implements SttClientInterface {
       return;
     }
 
-    const url = new URL('wss://waves-api.smallest.ai/api/v1/pulse/get_text');
+    const url = new URL('wss://api.smallest.ai/waves/v1/pulse/get_text');
     url.searchParams.append('language', 'en');
     url.searchParams.append('encoding', 'linear16');
     url.searchParams.append('sample_rate', '16000');
