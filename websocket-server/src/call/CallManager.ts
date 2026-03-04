@@ -42,7 +42,7 @@ export class CallManager {
     const session = new CallSession(opts);
     this.sessions.set(opts.callId, session);
 
-    const publicUrl = process.env.PUBLIC_URL ?? 'https://localhost:3001';
+    const publicUrl = (process.env.PUBLIC_URL ?? 'https://localhost:3001').replace(/\/$/, '');
     // Clean up protocol from URL for wss://
     const wssUrl = publicUrl.replace(/^https?:\/\//, '');
     const twimlUrl = `${publicUrl}/twiml/${opts.callId}`;

@@ -68,7 +68,7 @@ export function createServer() {
   // TwiML webhook — Twilio calls this to get streaming instructions
   app.post('/twiml/:callId', (req, res) => {
     const { callId } = req.params;
-    const publicUrl = process.env.PUBLIC_URL ?? `https://${req.hostname}`;
+    const publicUrl = (process.env.PUBLIC_URL ?? `https://${req.hostname}`).replace(/\/$/, '');
 
     const twimlResponse = new twilio.twiml.VoiceResponse();
     const connect = twimlResponse.connect();
