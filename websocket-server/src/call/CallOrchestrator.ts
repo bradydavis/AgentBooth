@@ -46,13 +46,14 @@ export class CallOrchestrator {
   private async handleTranscript(session: CallSession, text: string): Promise<void> {
     session.addTranscript('caller', text);
 
-    await redis.publish(`booth:${session.boothId}:updates`, JSON.stringify({
+    // Fire-and-forget — Redis is for dashboard only, never block the call on it
+    redis.publish(`booth:${session.boothId}:updates`, JSON.stringify({
       type: 'transcript',
       callId: session.callId,
       speaker: 'caller',
       text,
       timestamp: Date.now(),
-    }));
+    })).catch((err) => logger.warn('Redis publish failed (non-fatal)', err));
 
     const agentResponse = await this.getAgentResponse(session, text);
     await this.speakResponse(session, agentResponse);
@@ -106,13 +107,14 @@ export class CallOrchestrator {
     session.isAgentSpeaking = true;
     session.addTranscript('agent', text);
 
-    await redis.publish(`booth:${session.boothId}:updates`, JSON.stringify({
+    // Fire-and-forget — Redis is for dashboard only, never block the call on it
+    redis.publish(`booth:${session.boothId}:updates`, JSON.stringify({
       type: 'transcript',
       callId: session.callId,
       speaker: 'agent',
       text,
       timestamp: Date.now(),
-    }));
+    })).catch((err) => logger.warn('Redis publish failed (non-fatal)', err));
 
     try {
       const pcmStream = this.tts.textToSpeechStream(text);
