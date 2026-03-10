@@ -11,9 +11,15 @@ const PORT = parseInt(process.env.PORT ?? '3001', 10);
 async function main() {
   const { httpServer } = createServer();
 
-  // Start queue monitor — polls Redis every 5s and triggers calls
+  // Start queue monitor only if Redis is configured
+  const { isRedisAvailable } = await import('./utils/redis');
   const monitor = new QueueMonitor();
-  monitor.start();
+  if (isRedisAvailable()) {
+    monitor.start();
+    logger.info('Queue monitor started (Redis available)');
+  } else {
+    logger.warn('Redis not configured — queue monitor disabled. Set UPSTASH_REDIS_REST_URL + UPSTASH_REDIS_REST_TOKEN or REDIS_URL to enable.');
+  }
 
   httpServer.listen(PORT, () => {
     logger.info(`WebSocket server listening on port ${PORT}`);
