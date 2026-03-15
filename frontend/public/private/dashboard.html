@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brady's Dashboard</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0d1117;
+      color: #e6edf3;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #21262d;
+    }
+
+    .header h1 {
+      font-size: 22px;
+      font-weight: 600;
+      color: #e6edf3;
+    }
+
+    .header .datetime {
+      font-size: 14px;
+      color: #8b949e;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .card {
+      background: #161b22;
+      border: 1px solid #21262d;
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .card.wide { grid-column: span 2; }
+    .card.full { grid-column: span 3; }
+
+    .card-title {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #8b949e;
+      margin-bottom: 14px;
+    }
+
+    /* Weather */
+    .weather-main {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .weather-temp {
+      font-size: 48px;
+      font-weight: 300;
+      line-height: 1;
+    }
+
+    .weather-desc {
+      font-size: 16px;
+      color: #8b949e;
+    }
+
+    .weather-meta {
+      font-size: 13px;
+      color: #8b949e;
+      margin-top: 4px;
+    }
+
+    .climb-badge {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .climb-go { background: #1a4731; color: #3fb950; border: 1px solid #2ea043; }
+    .climb-marginal { background: #3a2a00; color: #d29922; border: 1px solid #9e6a03; }
+    .climb-no { background: #3d1a1a; color: #f85149; border: 1px solid #da3633; }
+
+    /* Tickers */
+    .tickers { display: flex; flex-direction: column; gap: 12px; }
+
+    .ticker-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 12px;
+      background: #0d1117;
+      border-radius: 8px;
+      border: 1px solid #21262d;
+    }
+
+    .ticker-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #e6edf3;
+    }
+
+    .ticker-sub {
+      font-size: 11px;
+      color: #8b949e;
+    }
+
+    .ticker-price {
+      text-align: right;
+    }
+
+    .ticker-price .price {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .ticker-price .change {
+      font-size: 12px;
+    }
+
+    .positive { color: #3fb950; }
+    .negative { color: #f85149; }
+    .neutral { color: #8b949e; }
+
+    /* News */
+    .news-list { display: flex; flex-direction: column; gap: 10px; }
+
+    .news-item {
+      padding: 10px 12px;
+      background: #0d1117;
+      border-radius: 8px;
+      border: 1px solid #21262d;
+      text-decoration: none;
+      display: block;
+      transition: border-color 0.15s;
+    }
+
+    .news-item:hover { border-color: #388bfd; }
+
+    .news-item .headline {
+      font-size: 13px;
+      color: #e6edf3;
+      line-height: 1.4;
+      margin-bottom: 4px;
+    }
+
+    .news-item .meta {
+      font-size: 11px;
+      color: #8b949e;
+    }
+
+    /* Projects */
+    .projects { display: flex; flex-direction: column; gap: 10px; }
+
+    .project-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px;
+      background: #0d1117;
+      border-radius: 8px;
+      border: 1px solid #21262d;
+    }
+
+    .project-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-top: 4px;
+      flex-shrink: 0;
+    }
+
+    .dot-active { background: #3fb950; }
+    .dot-blocked { background: #f85149; }
+    .dot-pending { background: #d29922; }
+
+    .project-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #e6edf3;
+      margin-bottom: 2px;
+    }
+
+    .project-status {
+      font-size: 12px;
+      color: #8b949e;
+      line-height: 1.4;
+    }
+
+    /* Tasks */
+    .tasks { display: flex; flex-direction: column; gap: 8px; }
+
+    .task-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      background: #0d1117;
+      border-radius: 8px;
+      border: 1px solid #21262d;
+      font-size: 13px;
+    }
+
+    .task-item .priority {
+      font-size: 10px;
+      padding: 2px 7px;
+      border-radius: 12px;
+      font-weight: 600;
+      flex-shrink: 0;
+    }
+
+    .p-high { background: #3d1a1a; color: #f85149; }
+    .p-med { background: #3a2a00; color: #d29922; }
+    .p-low { background: #1a2a1a; color: #3fb950; }
+
+    .loading { color: #8b949e; font-size: 13px; }
+
+    .refresh-btn {
+      background: none;
+      border: 1px solid #21262d;
+      color: #8b949e;
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .refresh-btn:hover { border-color: #388bfd; color: #388bfd; }
+
+    .last-updated {
+      font-size: 11px;
+      color: #484f58;
+      margin-top: 6px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <div>
+    <h1>🦅 Brady's Command Center</h1>
+    <div class="last-updated" id="lastUpdated">Loading...</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <div class="datetime" id="clock"></div>
+    <button class="refresh-btn" onclick="loadAll()">↻ Refresh</button>
+  </div>
+</div>
+
+<div class="grid">
+
+  <!-- Weather -->
+  <div class="card">
+    <div class="card-title">🌤 Little Rock Weather</div>
+    <div id="weather-content" class="loading">Loading...</div>
+  </div>
+
+  <!-- Crypto + Stocks -->
+  <div class="card">
+    <div class="card-title">📈 Markets</div>
+    <div class="tickers" id="tickers-content">
+      <div class="loading">Loading...</div>
+    </div>
+  </div>
+
+  <!-- Tasks -->
+  <div class="card">
+    <div class="card-title">✅ Today's Focus</div>
+    <div class="tasks">
+      <div class="task-item"><span class="priority p-high">HIGH</span> Trigger Railway build for AgentBooth (commit 3ab1edb)</div>
+      <div class="task-item"><span class="priority p-high">HIGH</span> Test AgentBooth call audio after deploy</div>
+      <div class="task-item"><span class="priority p-med">MED</span> Verify Kalshi account approval status</div>
+      <div class="task-item"><span class="priority p-med">MED</span> Review ETH position — up 5%+ this week</div>
+      <div class="task-item"><span class="priority p-low">LOW</span> Set up Gmail OAuth (client_secret.json needed)</div>
+    </div>
+  </div>
+
+  <!-- Polybot -->
+  <div class="card">
+    <div class="card-title">🤖 Polybot Status</div>
+    <div id="polybot-content">
+      <div class="ticker-row" style="margin-bottom:8px">
+        <div><div class="ticker-name">Status</div><div class="ticker-sub">Polymarket BTC Arb</div></div>
+        <div class="ticker-price"><div class="price positive">🟢 LIVE</div><div class="change neutral">Kraken feed active</div></div>
+      </div>
+      <div class="tasks">
+        <div class="task-item" style="font-size:12px">Edge threshold: <strong>6%</strong></div>
+        <div class="task-item" style="font-size:12px">Bet size: <strong>$5 USDC</strong></div>
+        <div class="task-item" style="font-size:12px">Daily loss limit: <strong>$50</strong></div>
+        <div class="task-item" style="font-size:12px">Balance: <strong>$300 USDC</strong></div>
+      </div>
+      <div class="last-updated" id="polybot-log">Watching for signals...</div>
+    </div>
+  </div>
+
+  <!-- Projects -->
+  <div class="card wide">
+    <div class="card-title">🚀 Projects</div>
+    <div class="projects">
+      <div class="project-item">
+        <div class="project-dot dot-blocked"></div>
+        <div>
+          <div class="project-name">AgentBooth — AI Phone Calls</div>
+          <div class="project-status">Deployed @ agentbooth.app + Railway. Audio silence bug — latest fix (3ab1edb) pushed to GitHub, needs Railway redeploy. Twilio → Smallest.ai TTS pipeline confirmed valid locally.</div>
+        </div>
+      </div>
+      <div class="project-item">
+        <div class="project-dot dot-active"></div>
+        <div>
+          <div class="project-name">SwiftBase — Consulting + Agentic Workers</div>
+          <div class="project-status">Active. Building context engineering layer (Delta Lakes) for small businesses. Pitch: "We build the brain, then deploy the worker."</div>
+        </div>
+      </div>
+      <div class="project-item">
+        <div class="project-dot dot-pending"></div>
+        <div>
+          <div class="project-name">Kalshi Weather Betting</div>
+          <div class="project-status">Account under review. Strategy ready — daily weather markets across NYC, Miami, Chicago, Denver, Austin, Houston, Philly. Will activate once approved.</div>
+        </div>
+      </div>
+      <div class="project-item">
+        <div class="project-dot dot-pending"></div>
+        <div>
+          <div class="project-name">Crypto Trading (ETH)</div>
+          <div class="project-status">Holding 0.02276 ETH since Feb 20. ETH up ~5% this week. Watching for Solana meme coin entry (cheaper gas than Ethereum).</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI News -->
+  <div class="card">
+    <div class="card-title">🤖 AI News</div>
+    <div class="news-list" id="news-content">
+      <div class="loading">Loading...</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // Clock
+  function updateClock() {
+    const now = new Date();
+    document.getElementById('clock').textContent = now.toLocaleString('en-US', {
+      weekday: 'short', month: 'short', day: 'numeric',
+      hour: 'numeric', minute: '2-digit', timeZoneName: 'short',
+      timeZone: 'America/Chicago'
+    });
+  }
+  setInterval(updateClock, 1000);
+  updateClock();
+
+  // Weather
+  async function loadWeather() {
+    try {
+      const res = await fetch('https://wttr.in/72223?format=j1');
+      const d = await res.json();
+      const cur = d.current_condition[0];
+      const today = d.weather[0];
+      const tempF = cur.temp_F;
+      const desc = cur.weatherDesc[0].value;
+      const wind = cur.windspeedMiles;
+      const rain = today.hourly.some(h => parseInt(h.chanceofrain) > 30);
+      const maxF = today.maxtempF;
+      const minF = today.mintempF;
+
+      let climbClass = 'climb-go', climbText = '🧗 GO CLIMB';
+      if (rain || parseInt(wind) > 20 || parseInt(maxF) < 40 || parseInt(maxF) > 95) {
+        climbClass = 'climb-no'; climbText = '⛔ BAD CONDITIONS';
+      } else if (parseInt(wind) > 12 || parseInt(maxF) < 50) {
+        climbClass = 'climb-marginal'; climbText = '⚠️ MARGINAL';
+      }
+
+      document.getElementById('weather-content').innerHTML = `
+        <div class="weather-main">
+          <div class="weather-temp">${tempF}°F</div>
+          <div class="weather-desc">${desc}</div>
+        </div>
+        <div class="weather-meta">H: ${maxF}° / L: ${minF}° · Wind: ${wind} mph · Humidity: ${cur.humidity}%</div>
+        <span class="climb-badge ${climbClass}">${climbText}</span>
+      `;
+    } catch (e) {
+      document.getElementById('weather-content').innerHTML = '<span class="neutral">Failed to load</span>';
+    }
+  }
+
+  // Tickers
+  async function loadTickers() {
+    const tickers = [
+      { symbol: 'ETH', name: 'Ethereum', type: 'crypto', id: 'ethereum' },
+      { symbol: 'BTC', name: 'Bitcoin', type: 'crypto', id: 'bitcoin' },
+      { symbol: 'DOW', name: 'Dow Inc', type: 'stock' },
+      { symbol: 'MEG', name: 'MEG', type: 'stock' },
+    ];
+
+    const container = document.getElementById('tickers-content');
+    container.innerHTML = '';
+
+    // Crypto via CoinGecko
+    let cryptoData = {};
+    try {
+      const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum,bitcoin&vs_currencies=usd&include_24hr_change=true');
+      cryptoData = await res.json();
+    } catch(e) {}
+
+    for (const t of tickers) {
+      let price = '—', change = null, changeStr = '—';
+
+      if (t.type === 'crypto' && cryptoData[t.id]) {
+        price = '$' + cryptoData[t.id].usd.toLocaleString('en-US', {maximumFractionDigits: 2});
+        change = cryptoData[t.id].usd_24h_change;
+        changeStr = (change >= 0 ? '+' : '') + change.toFixed(2) + '%';
+      } else if (t.type === 'stock') {
+        try {
+          const res = await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${t.symbol}?interval=1d&range=1d`);
+          const data = await res.json();
+          const meta = data.chart.result[0].meta;
+          price = '$' + meta.regularMarketPrice.toFixed(2);
+          change = ((meta.regularMarketPrice - meta.previousClose) / meta.previousClose) * 100;
+          changeStr = (change >= 0 ? '+' : '') + change.toFixed(2) + '%';
+        } catch(e) { price = '—'; changeStr = '—'; }
+      }
+
+      const colorClass = change === null ? 'neutral' : change >= 0 ? 'positive' : 'negative';
+
+      container.innerHTML += `
+        <div class="ticker-row">
+          <div>
+            <div class="ticker-name">${t.symbol}</div>
+            <div class="ticker-sub">${t.name}</div>
+          </div>
+          <div class="ticker-price">
+            <div class="price">${price}</div>
+            <div class="change ${colorClass}">${changeStr}</div>
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  // AI News via Hacker News (AI tag) + hardcoded recent Nate B Jones
+  async function loadNews() {
+    const container = document.getElementById('news-content');
+    try {
+      const res = await fetch('https://hacker-news.firebaseio.com/v0/topstories.json');
+      const ids = await res.json();
+      const top = ids.slice(0, 30);
+
+      const stories = await Promise.all(top.map(id =>
+        fetch(`https://hacker-news.firebaseio.com/v0/item/${id}.json`).then(r => r.json())
+      ));
+
+      const aiKeywords = ['AI', 'LLM', 'GPT', 'Claude', 'Gemini', 'agent', 'model', 'OpenAI', 'Anthropic', 'machine learning', 'neural'];
+      const aiStories = stories
+        .filter(s => s && s.title && aiKeywords.some(k => s.title.toLowerCase().includes(k.toLowerCase())))
+        .slice(0, 4);
+
+      if (aiStories.length === 0) {
+        container.innerHTML = '<div class="loading">No AI headlines right now</div>';
+        return;
+      }
+
+      container.innerHTML = aiStories.map(s => `
+        <a class="news-item" href="${s.url || '#'}" target="_blank">
+          <div class="headline">${s.title}</div>
+          <div class="meta">HN · ${s.score} pts · ${s.descendants || 0} comments</div>
+        </a>
+      `).join('');
+    } catch(e) {
+      container.innerHTML = '<span class="neutral">Failed to load</span>';
+    }
+  }
+
+  async function loadAll() {
+    await Promise.all([loadWeather(), loadTickers(), loadNews()]);
+    document.getElementById('lastUpdated').textContent = 'Last updated: ' + new Date().toLocaleTimeString('en-US', { timeZone: 'America/Chicago' });
+  }
+
+  // Auto-refresh every 5 minutes
+  loadAll();
+  setInterval(loadAll, 5 * 60 * 1000);
+</script>
+</body>
+</html>
