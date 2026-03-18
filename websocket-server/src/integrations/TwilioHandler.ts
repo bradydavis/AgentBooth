@@ -22,9 +22,12 @@ export class TwilioHandler {
         try {
           const msg = JSON.parse(data.toString()) as {
             event: string;
-            start?: { streamSid: string };
+            streamSid?: string;
+            start?: { streamSid: string; callSid: string; tracks: string[] };
             media?: { payload: string };
+            stop?: { callSid: string };
           };
+          logger.info(`[WS] event=${msg.event} callId=${callId} streamSid=${msg.streamSid ?? msg.start?.streamSid ?? 'none'}`);
 
           const session = this.callManager.getSession(callId);
           if (!session) {
@@ -40,7 +43,8 @@ export class TwilioHandler {
 
             case 'start':
               session.twilioWs = ws;
-              session.streamSid = msg.start?.streamSid ?? null;
+              session.streamSid = msg.start?.streamSid ?? msg.streamSid ?? null;
+              logger.info(`[START] callId=${callId} streamSid=${session.streamSid}`);
               await orchestrator.setupCall(session);
               logger.info(`Call pipeline ready: ${callId}`);
               break;
