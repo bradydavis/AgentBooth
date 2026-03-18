@@ -50,7 +50,7 @@ export class CallManager {
     try {
       const call = await this.twilioClient.calls.create({
         to: opts.phoneNumber,
-        from: process.env.TWILIO_PHONE_NUMBER!,
+        from: process.env.TWILIO_CALLER_ID ?? process.env.TWILIO_PHONE_NUMBER!,
         url: twimlUrl,
         statusCallback: `${publicUrl}/api/call-status/${opts.callId}`,
         statusCallbackEvent: ['initiated', 'ringing', 'answered', 'completed'],
