@@ -38,6 +38,19 @@ export class CallManager {
     }
   }
 
+  async createInboundSession(opts: { callId: string; boothId: string; agentId: string; phoneNumber: string; context?: string }) {
+    const session = new CallSession({
+      callId: opts.callId,
+      boothId: opts.boothId,
+      agentId: opts.agentId,
+      phoneNumber: opts.phoneNumber,
+      context: opts.context ?? '',
+      webhookUrl: undefined,
+    });
+    this.sessions.set(opts.callId, session);
+    return session;
+  }
+
   async initiateCall(opts: InitiateCallOptions) {
     const session = new CallSession(opts);
     this.sessions.set(opts.callId, session);

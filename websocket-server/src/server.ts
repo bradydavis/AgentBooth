@@ -32,6 +32,30 @@ export function createServer() {
     });
   });
 
+  // Inbound call handler — Twilio calls this when someone calls our number
+  app.post('/twiml/inbound', async (req, res) => {
+    const callId = `inbound-${Date.now()}`;
+    const from = req.body.From ?? 'unknown';
+    const publicUrl = (process.env.PUBLIC_URL ?? `https://${req.hostname}`).replace(/\/$/, '');
+    const wssUrl = `wss://${publicUrl.replace(/^https?:\/\//, '')}/media/${callId}`;
+
+    logger.info(`Inbound call from ${from}, assigning callId: ${callId}`);
+
+    // Create session for this inbound call
+    await callManager.createInboundSession({
+      callId,
+      boothId: 'inbound',
+      agentId: 'leo',
+      phoneNumber: from,
+      context: process.env.INBOUND_AGENT_CONTEXT ?? 'You are Leo, a helpful AI assistant at AgentBooth. Greet the caller warmly and help them with whatever they need.',
+    });
+
+    const twimlResponse = new twilio.twiml.VoiceResponse();
+    const connect = twimlResponse.connect();
+    connect.stream({ url: wssUrl, track: 'both_tracks' as any });
+    res.type('text/xml').send(twimlResponse.toString());
+  });
+
   // TwiML webhook — Twilio calls this to get streaming instructions
   app.post('/twiml/:callId', (req, res) => {
     const { callId } = req.params;
