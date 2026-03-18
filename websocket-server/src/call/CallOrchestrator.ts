@@ -27,7 +27,7 @@ export class CallOrchestrator {
       onError: (err) => logger.error('STT error', err),
     }).then(() => {
       logger.info(`STT connected for call ${session.callId}`);
-    }).catch((err) => {
+    }).catch((err: unknown) => {
       logger.error(`STT connect failed for call ${session.callId} (non-fatal — caller won't be heard)`, err);
     });
 
@@ -59,7 +59,7 @@ export class CallOrchestrator {
       speaker: 'caller',
       text,
       timestamp: Date.now(),
-    })).catch((err) => logger.warn('Redis publish failed (non-fatal)', err));
+    })).catch((err: unknown) => logger.warn('Redis publish failed (non-fatal)', err));
 
     const agentResponse = await this.getAgentResponse(session, text);
     await this.speakResponse(session, agentResponse);
@@ -121,7 +121,7 @@ export class CallOrchestrator {
       speaker: 'agent',
       text,
       timestamp: Date.now(),
-    })).catch((err) => logger.warn('Redis publish failed (non-fatal)', err));
+    })).catch((err: unknown) => logger.warn('Redis publish failed (non-fatal)', err));
 
     try {
       const pcmStream = this.tts.textToSpeechStream(text);
