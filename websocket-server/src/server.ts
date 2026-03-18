@@ -25,6 +25,13 @@ export function createServer() {
     });
   });
 
+  app.get('/api/debug/sessions', (_req, res) => {
+    res.json({
+      activeCalls: callManager.activeCallCount(),
+      sessions: callManager.getSessionDebugInfo(),
+    });
+  });
+
   // TwiML webhook — Twilio calls this to get streaming instructions
   app.post('/twiml/:callId', (req, res) => {
     const { callId } = req.params;

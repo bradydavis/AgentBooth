@@ -82,4 +82,17 @@ export class CallManager {
   activeCallCount(): number {
     return this.sessions.size;
   }
+
+  getSessionDebugInfo(): object[] {
+    const result: object[] = [];
+    this.sessions.forEach((session, callId) => {
+      result.push({
+        callId,
+        streamSid: session.streamSid,
+        wsReady: session.twilioWs?.readyState,
+        isAgentSpeaking: session.isAgentSpeaking,
+      });
+    });
+    return result;
+  }
 }
