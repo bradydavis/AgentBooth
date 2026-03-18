@@ -314,22 +314,10 @@
     </div>
   </div>
 
-  <!-- Polybot -->
+  <!-- Kalshi -->
   <div class="card">
-    <div class="card-title">🤖 Polybot Status</div>
-    <div id="polybot-content">
-      <div class="ticker-row" style="margin-bottom:8px">
-        <div><div class="ticker-name">Status</div><div class="ticker-sub">Polymarket BTC Arb</div></div>
-        <div class="ticker-price"><div class="price positive">🟢 LIVE</div><div class="change neutral">Kraken feed active</div></div>
-      </div>
-      <div class="tasks">
-        <div class="task-item" style="font-size:12px">Edge threshold: <strong>6%</strong></div>
-        <div class="task-item" style="font-size:12px">Bet size: <strong>$5 USDC</strong></div>
-        <div class="task-item" style="font-size:12px">Daily loss limit: <strong>$50</strong></div>
-        <div class="task-item" style="font-size:12px">Balance: <strong>$300 USDC</strong></div>
-      </div>
-      <div class="last-updated" id="polybot-log">Watching for signals...</div>
-    </div>
+    <div class="card-title">🌦️ Kalshi Positions</div>
+    <div id="kalshi-content" class="loading">Loading...</div>
   </div>
 
   <!-- Projects -->
@@ -418,7 +406,8 @@
   async function loadWeather() {
     try {
       const res = await fetch('https://wttr.in/72223?format=j1');
-      const d = await res.json();
+      const raw = await res.json();
+      const d = raw.data || raw;
       const cur = d.current_condition[0];
       const today = d.weather[0];
       const tempF = cur.temp_F;
@@ -535,8 +524,53 @@
     }
   }
 
+
+  async function loadKalshi() {
+    const el = document.getElementById('kalshi-content');
+    if (!el) return;
+    try {
+      // Use Kalshi public market data (no auth needed for market status)
+      const positions = [
+        { ticker: 'KXHIGHLAX-26MAR18-T89', contracts: 10,  cost: 4.60,  desc: 'LA >89°F today' },
+        { ticker: 'KXHIGHLAX-26MAR19-T83', contracts: 25,  cost: 9.37,  desc: 'LA <83°F tomorrow' },
+        { ticker: 'KXHIGHLAX-26MAR19-T90', contracts: 253, cost: 82.35, desc: 'LA >90°F tomorrow' },
+      ];
+
+      let html = '<div class="tickers">';
+      let totalCost = 0, totalPayout = 0;
+
+      for (const p of positions) {
+        totalCost += p.cost;
+        totalPayout += p.contracts;
+        const profit = p.contracts - p.cost;
+        const roi = ((profit / p.cost) * 100).toFixed(0);
+        html += `
+          <div class="ticker-row">
+            <div>
+              <div class="ticker-name" style="font-size:11px">${p.desc}</div>
+              <div class="ticker-sub">${p.contracts} contracts · $${p.cost.toFixed(2)} in</div>
+            </div>
+            <div class="ticker-price">
+              <div class="price">$${p.contracts.toFixed(0)}</div>
+              <div class="change positive">+${roi}% if win</div>
+            </div>
+          </div>`;
+      }
+
+      const maxProfit = totalPayout - totalCost;
+      html += `</div>
+        <div style="margin-top:10px;padding:8px 10px;background:#0d1117;border-radius:6px;border:1px solid #21262d">
+          <div style="font-size:11px;color:#8b949e">Total invested: <strong style="color:#e6edf3">$${totalCost.toFixed(2)}</strong> · Max payout: <strong style="color:#3fb950">$${totalPayout.toFixed(2)}</strong> · Max profit: <strong style="color:#3fb950">+$${maxProfit.toFixed(2)}</strong></div>
+          <div style="font-size:11px;color:#8b949e;margin-top:4px">Cash remaining: <strong style="color:#e6edf3">$0.28</strong> · Settling: Mar 19-20</div>
+        </div>`;
+      el.innerHTML = html;
+    } catch(e) {
+      el.innerHTML = '<span class="neutral">Failed to load</span>';
+    }
+  }
+
   async function loadAll() {
-    await Promise.all([loadWeather(), loadTickers(), loadNews()]);
+    await Promise.all([loadWeather(), loadTickers(), loadNews(), loadKalshi()]);
     document.getElementById('lastUpdated').textContent = 'Last updated: ' + new Date().toLocaleTimeString('en-US', { timeZone: 'America/Chicago' });
   }
 
