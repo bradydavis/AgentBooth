@@ -27,7 +27,11 @@ export class TwilioHandler {
           };
 
           const session = this.callManager.getSession(callId);
-          if (!session) return;
+          if (!session) {
+            logger.error(`[FATAL] No session found for callId: ${callId} — possible multi-instance routing issue. Active sessions: ${this.callManager.getActiveCallCount()}`);
+            ws.close();
+            return;
+          }
 
           switch (msg.event) {
             case 'connected':
