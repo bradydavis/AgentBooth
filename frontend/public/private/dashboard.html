@@ -288,7 +288,7 @@
 
 <div class="grid">  <!-- Weather -->
   <div class="card">
-    <div class="card-title">🌤 Little Rock Weather</div>
+    <div class="card-title">🌴 Exuma, Bahamas Weather <span style="color:#484f58;font-weight:400;font-size:10px">(traveling · home Mar 26)</span></div>
     <div id="weather-content" class="loading">Loading...</div>
   </div>
 
@@ -359,14 +359,6 @@
   </div>
 
 
-  <!-- Markets -->
-  <div class="card">
-    <div class="card-title">📈 Markets</div>
-    <div class="tickers" id="tickers-content">
-      <div class="loading">Loading...</div>
-    </div>
-  </div>
-
   <!-- Agent Skills -->
   <div class="card full">
     <div class="card-title" style="display:flex;justify-content:space-between;align-items:center">
@@ -405,10 +397,11 @@
   setInterval(updateClock, 1000);
   updateClock();
 
-  // Weather
+  // Weather — currently showing travel location (Exuma, Bahamas)
+  // TODO: revert to 72223 (Little Rock) when Brady returns ~Mar 26
   async function loadWeather() {
     try {
-      const res = await fetch('https://wttr.in/72223?format=j1');
+      const res = await fetch('https://wttr.in/Exuma+Bahamas?format=j1');
       const raw = await res.json();
       const d = raw.data || raw;
       const cur = d.current_condition[0];
@@ -420,11 +413,11 @@
       const maxF = today.maxtempF;
       const minF = today.mintempF;
 
-      let climbClass = 'climb-go', climbText = '🧗 GO CLIMB';
-      if (rain || parseInt(wind) > 20 || parseInt(maxF) < 40 || parseInt(maxF) > 95) {
-        climbClass = 'climb-no'; climbText = '⛔ BAD CONDITIONS';
-      } else if (parseInt(wind) > 12 || parseInt(maxF) < 50) {
-        climbClass = 'climb-marginal'; climbText = '⚠️ MARGINAL';
+      let beachClass = 'climb-go', beachText = '🏖️ PERFECT BEACH DAY';
+      if (rain || parseInt(wind) > 25) {
+        beachClass = 'climb-no'; beachText = '⛈️ STAY INSIDE';
+      } else if (parseInt(wind) > 15) {
+        beachClass = 'climb-marginal'; beachText = '🌊 CHOPPY WATERS';
       }
 
       document.getElementById('weather-content').innerHTML = `
@@ -433,7 +426,7 @@
           <div class="weather-desc">${desc}</div>
         </div>
         <div class="weather-meta">H: ${maxF}° / L: ${minF}° · Wind: ${wind} mph · Humidity: ${cur.humidity}%</div>
-        <span class="climb-badge ${climbClass}">${climbText}</span>
+        <span class="climb-badge ${beachClass}">${beachText}</span>
       `;
     } catch (e) {
       document.getElementById('weather-content').innerHTML = '<span class="neutral">Failed to load</span>';
@@ -573,7 +566,7 @@
   }
 
   async function loadAll() {
-    await Promise.all([loadWeather(), loadTickers(), loadNews(), loadKalshi()]);
+    await Promise.all([loadWeather(), loadNews(), loadKalshi()]);
     document.getElementById('lastUpdated').textContent = 'Last updated: ' + new Date().toLocaleTimeString('en-US', { timeZone: 'America/Chicago' });
   }
 
