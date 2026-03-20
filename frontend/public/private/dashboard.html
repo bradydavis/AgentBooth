@@ -250,7 +250,7 @@
       color: #484f58;
       margin-top: 6px;
     }
-  
+
     .agent-category { border-bottom: 1px solid #21262d; }
     .cat-header {
       display: flex; align-items: center; gap: 8px;
@@ -286,12 +286,21 @@
   </div>
 </div>
 
-<div class="grid">  <!-- Weather -->
+<div class="grid">
+
+  <!-- Weather -->
   <div class="card">
     <div class="card-title">🌴 Exuma, Bahamas Weather <span style="color:#484f58;font-weight:400;font-size:10px">(traveling · home Mar 26)</span></div>
     <div id="weather-content" class="loading">Loading...</div>
   </div>
 
+  <!-- Crypto Tickers -->
+  <div class="card">
+    <div class="card-title">📈 Markets</div>
+    <div class="tickers" id="tickers-content">
+      <div class="loading">Loading...</div>
+    </div>
+  </div>
 
   <!-- AI News -->
   <div class="card">
@@ -301,63 +310,108 @@
     </div>
   </div>
 
+  <!-- Kalshi Bot Status -->
+  <div class="card">
+    <div class="card-title">🤖 KalshiBot Status</div>
+    <div id="kalshi-bot-content">
+      <div class="tickers">
+        <div class="ticker-row">
+          <div>
+            <div class="ticker-name" style="color:#3fb950">● RUNNING</div>
+            <div class="ticker-sub">PID 66945 · 2min cycle</div>
+          </div>
+          <div class="ticker-price">
+            <div class="price">$48.03</div>
+            <div class="change negative">P&L: -$1.07</div>
+          </div>
+        </div>
+        <div class="ticker-row">
+          <div>
+            <div class="ticker-name" style="font-size:11px">Latest bet</div>
+            <div class="ticker-sub">YES LA &gt;83°F Mar 21 · $3.00</div>
+          </div>
+          <div class="ticker-price">
+            <div class="price positive">75¢ ea</div>
+            <div class="change neutral">fair: 1.00</div>
+          </div>
+        </div>
+        <div style="margin-top:8px;font-size:11px;color:#8b949e;padding:8px 10px;background:#0d1117;border-radius:6px;border:1px solid #21262d">
+          Balance: <strong style="color:#e6edf3">$48.03</strong> · 1 trade today · $10/mkt cap · 30% drawdown stop
+        </div>
+      </div>
+    </div>
+  </div>
 
+  <!-- Kalshi Positions -->
+  <div class="card">
+    <div class="card-title">🌦️ Kalshi Open Positions</div>
+    <div id="kalshi-content" class="loading">Loading...</div>
+  </div>
+
+  <!-- Kalshi P&L Chart -->
+  <div class="card full" style="min-height:240px">
+    <div class="card-title" style="display:flex;justify-content:space-between;align-items:center">
+      <span>📉 Kalshi Balance History <span style="color:#484f58;font-size:10px;font-weight:400;margin-left:6px">Mar 18 – now · from bot logs</span></span>
+      <span style="font-size:11px;color:#8b949e">Started: <strong style="color:#e6edf3">$100</strong> · Current: <strong style="color:#3fb950">$48.03</strong> · Net: <strong style="color:#f85149">-$51.97</strong></span>
+    </div>
+    <div style="position:relative;height:180px">
+      <canvas id="kalshiChart"></canvas>
+    </div>
+  </div>
 
   <!-- Tasks -->
   <div class="card">
     <div class="card-title">✅ Today's Focus</div>
     <div class="tasks">
-      <div class="task-item"><span class="priority p-high">HIGH</span> Trigger Railway build for AgentBooth (commit 3ab1edb)</div>
-      <div class="task-item"><span class="priority p-high">HIGH</span> Test AgentBooth call audio after deploy</div>
-      <div class="task-item"><span class="priority p-med">MED</span> Verify Kalshi account approval status</div>
-      <div class="task-item"><span class="priority p-med">MED</span> Review ETH position — up 5%+ this week</div>
+      <div class="task-item"><span class="priority p-high">HIGH</span> Monitor KalshiBot — hit insufficient_balance briefly today</div>
+      <div class="task-item"><span class="priority p-high">HIGH</span> Test AgentBooth call audio (commit 3ab1edb needs Railway redeploy)</div>
+      <div class="task-item"><span class="priority p-med">MED</span> Review ETH position — holding 0.02276 ETH</div>
+      <div class="task-item"><span class="priority p-med">MED</span> Update P&L tracking files (betting.md still blank)</div>
       <div class="task-item"><span class="priority p-low">LOW</span> Set up Gmail OAuth (client_secret.json needed)</div>
     </div>
   </div>
 
-
-  <!-- Kalshi -->
-  <div class="card">
-    <div class="card-title">🌦️ Kalshi Positions</div>
-    <div id="kalshi-content" class="loading">Loading...</div>
-  </div>
-
-
   <!-- Projects -->
-  <div class="card wide">
+  <div class="card full">
     <div class="card-title">🚀 Projects</div>
     <div class="projects">
       <div class="project-item">
         <div class="project-dot dot-blocked"></div>
         <div>
           <div class="project-name">AgentBooth — AI Phone Calls</div>
-          <div class="project-status">Deployed @ agentbooth.app + Railway. Audio silence bug — latest fix (3ab1edb) pushed to GitHub, needs Railway redeploy. Twilio → Smallest.ai TTS pipeline confirmed valid locally.</div>
+          <div class="project-status">Deployed @ agentbooth.app + Railway. Audio silence bug — fix (3ab1edb) pushed to GitHub, needs Railway redeploy. Twilio → Smallest.ai TTS pipeline confirmed valid locally.</div>
+        </div>
+      </div>
+      <div class="project-item">
+        <div class="project-dot dot-active"></div>
+        <div>
+          <div class="project-name">KalshiBot — Weather Betting Automation</div>
+          <div class="project-status">Running ✅ PID 66945 · v4 with process lock, $10/market cap, 30% drawdown stop, 5min cooldown · Balance $48.03 · Today: 1 trade, P&L -$1.07 · Hit insufficient_balance errors earlier (resolved)</div>
+        </div>
+      </div>
+      <div class="project-item">
+        <div class="project-dot dot-active"></div>
+        <div>
+          <div class="project-name">PolyBot — Polymarket Crypto Betting</div>
+          <div class="project-status">Running ✅ PID 66730 · $300 USDC deployed · Sort bug fixed, live trading active</div>
         </div>
       </div>
       <div class="project-item">
         <div class="project-dot dot-active"></div>
         <div>
           <div class="project-name">SwiftBase — Consulting + Agentic Workers</div>
-          <div class="project-status">Active. Building context engineering layer (Delta Lakes) for small businesses. Pitch: "We build the brain, then deploy the worker."</div>
-        </div>
-      </div>
-      <div class="project-item">
-        <div class="project-dot dot-pending"></div>
-        <div>
-          <div class="project-name">Kalshi Weather Betting</div>
-          <div class="project-status">Account under review. Strategy ready — daily weather markets across NYC, Miami, Chicago, Denver, Austin, Houston, Philly. Will activate once approved.</div>
+          <div class="project-status">Active. Building context engineering layer (Delta Lakes) for small businesses. Alleviant Mental Health (TMS portal) — pre-dev / planning.</div>
         </div>
       </div>
       <div class="project-item">
         <div class="project-dot dot-pending"></div>
         <div>
           <div class="project-name">Crypto Trading (ETH)</div>
-          <div class="project-status">Holding 0.02276 ETH since Feb 20. ETH up ~5% this week. Watching for Solana meme coin entry (cheaper gas than Ethereum).</div>
+          <div class="project-status">Holding 0.02276 ETH (~$48 at $2,124). Down from $300 initial. Watching for Solana meme coin entry (cheaper gas). ETH -1.06% today.</div>
         </div>
       </div>
     </div>
   </div>
-
 
   <!-- Agent Skills -->
   <div class="card full">
@@ -382,9 +436,130 @@
       </div>
     </div>
   </div>
+
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
 <script>
+  // ── Kalshi P&L Chart ─────────────────────────────────────────────────────
+  // Key inflection points extracted from bot.log (sampled ~hourly for clarity)
+  // Pre-log: account started at $100 (manual deposit before bot launched)
+  const KALSHI_HISTORY = [
+    // Label, balance, annotation (optional)
+    { t: "Mar 18 ~10:00", b: 100.00, note: "Start ($100 deposit)" },
+    { t: "Mar 18 10:28",  b: 90.02,  note: "Bot live" },
+    { t: "Mar 18 10:38",  b: 74.43 },
+    { t: "Mar 18 10:48",  b: 49.69 },
+    { t: "Mar 18 10:58",  b: 29.50 },
+    { t: "Mar 18 11:09",  b: 12.63,  note: "13 zombie bots running" },
+    { t: "Mar 18 11:19",  b: 0.28,   note: "WIPED 💀" },
+    { t: "Mar 19 00:00",  b: 0.28 },
+    { t: "Mar 19 12:00",  b: 0.28 },
+    { t: "Mar 20 00:00",  b: 0.28 },
+    { t: "Mar 20 13:00",  b: 0.10 },
+    { t: "Mar 20 14:15",  b: 49.10,  note: "Reloaded $50 ↑" },
+    { t: "Mar 20 14:18",  b: 48.03,  note: "Now (v4 bot)" },
+  ];
+
+  function drawKalshiChart() {
+    const ctx = document.getElementById('kalshiChart');
+    if (!ctx) return;
+    const labels = KALSHI_HISTORY.map(p => p.t);
+    const data   = KALSHI_HISTORY.map(p => p.b);
+
+    // Color segments: red while below start, green after reload
+    const pointColors = data.map((b, i) => {
+      if (i === 0) return '#8b949e';
+      if (b <= 1)  return '#f85149';
+      if (b >= 49) return '#3fb950';
+      return '#f85149';
+    });
+
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{
+          data,
+          borderColor: (ctx) => {
+            const idx = ctx.p1DataIndex;
+            const val = data[idx];
+            if (val <= 1)  return '#f85149';
+            if (val >= 49) return '#3fb950';
+            return '#f85149';
+          },
+          segment: {
+            borderColor: ctx => {
+              const v = ctx.p1.parsed.y;
+              if (v <= 1)  return '#f85149';
+              if (v >= 40) return '#3fb950';
+              return '#f85149';
+            }
+          },
+          backgroundColor: 'transparent',
+          pointBackgroundColor: pointColors,
+          pointRadius: data.map((b, i) =>
+            KALSHI_HISTORY[i].note ? 5 : 2
+          ),
+          pointHoverRadius: 6,
+          borderWidth: 2,
+          tension: 0.1,
+          fill: {
+            target: 'origin',
+            above: 'rgba(63,185,80,0.05)',
+            below: 'rgba(248,81,73,0.07)',
+          }
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: { duration: 600 },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: '#161b22',
+            borderColor: '#21262d',
+            borderWidth: 1,
+            titleColor: '#8b949e',
+            bodyColor: '#e6edf3',
+            callbacks: {
+              label: ctx => {
+                const note = KALSHI_HISTORY[ctx.dataIndex].note;
+                return note
+                  ? [`Balance: $${ctx.parsed.y.toFixed(2)}`, note]
+                  : `Balance: $${ctx.parsed.y.toFixed(2)}`;
+              }
+            }
+          },
+          annotation: { annotations: {} }
+        },
+        scales: {
+          x: {
+            grid: { color: '#21262d' },
+            ticks: {
+              color: '#484f58',
+              font: { size: 9 },
+              maxRotation: 35,
+              autoSkip: true,
+              maxTicksLimit: 8
+            }
+          },
+          y: {
+            grid: { color: '#21262d' },
+            ticks: {
+              color: '#8b949e',
+              font: { size: 10 },
+              callback: v => '$' + v.toFixed(0)
+            },
+            suggestedMin: 0,
+            suggestedMax: 110
+          }
+        }
+      }
+    });
+  }
+
   // Clock
   function updateClock() {
     const now = new Date();
@@ -397,8 +572,7 @@
   setInterval(updateClock, 1000);
   updateClock();
 
-  // Weather — currently showing travel location (Exuma, Bahamas)
-  // TODO: revert to 72223 (Little Rock) when Brady returns ~Mar 26
+  // Weather — showing Exuma, Bahamas (Brady traveling Mar 19-26)
   async function loadWeather() {
     try {
       const res = await fetch('https://wttr.in/Exuma+Bahamas?format=j1');
@@ -409,14 +583,14 @@
       const tempF = cur.temp_F;
       const desc = cur.weatherDesc[0].value;
       const wind = cur.windspeedMiles;
-      const rain = today.hourly.some(h => parseInt(h.chanceofrain) > 30);
+      const maxRain = Math.max(...today.hourly.map(h => parseInt(h.chanceofrain)));
       const maxF = today.maxtempF;
       const minF = today.mintempF;
 
       let beachClass = 'climb-go', beachText = '🏖️ PERFECT BEACH DAY';
-      if (rain || parseInt(wind) > 25) {
+      if (maxRain > 50 || parseInt(wind) > 25) {
         beachClass = 'climb-no'; beachText = '⛈️ STAY INSIDE';
-      } else if (parseInt(wind) > 15) {
+      } else if (parseInt(wind) > 15 || maxRain > 30) {
         beachClass = 'climb-marginal'; beachText = '🌊 CHOPPY WATERS';
       }
 
@@ -426,6 +600,7 @@
           <div class="weather-desc">${desc}</div>
         </div>
         <div class="weather-meta">H: ${maxF}° / L: ${minF}° · Wind: ${wind} mph · Humidity: ${cur.humidity}%</div>
+        <div class="weather-meta" style="margin-top:2px">Rain chance: ${maxRain}%</div>
         <span class="climb-badge ${beachClass}">${beachText}</span>
       `;
     } catch (e) {
@@ -435,22 +610,19 @@
 
   // Tickers
   async function loadTickers() {
-    const tickers = [
-      { symbol: 'ETH', name: 'Ethereum', type: 'crypto', id: 'ethereum' },
-      { symbol: 'BTC', name: 'Bitcoin', type: 'crypto', id: 'bitcoin' },
-      { symbol: 'DOW', name: 'Dow Inc', type: 'stock' },
-      { symbol: 'MEG', name: 'MEG', type: 'stock' },
-    ];
-
     const container = document.getElementById('tickers-content');
     container.innerHTML = '';
 
-    // Crypto via CoinGecko
     let cryptoData = {};
     try {
       const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum,bitcoin&vs_currencies=usd&include_24hr_change=true');
       cryptoData = await res.json();
     } catch(e) {}
+
+    const tickers = [
+      { symbol: 'ETH', name: 'Ethereum · holding 0.02276', type: 'crypto', id: 'ethereum' },
+      { symbol: 'BTC', name: 'Bitcoin', type: 'crypto', id: 'bitcoin' },
+    ];
 
     for (const t of tickers) {
       let price = '—', change = null, changeStr = '—';
@@ -459,19 +631,9 @@
         price = '$' + cryptoData[t.id].usd.toLocaleString('en-US', {maximumFractionDigits: 2});
         change = cryptoData[t.id].usd_24h_change;
         changeStr = (change >= 0 ? '+' : '') + change.toFixed(2) + '%';
-      } else if (t.type === 'stock') {
-        try {
-          const res = await fetch(`https://query1.finance.yahoo.com/v8/finance/chart/${t.symbol}?interval=1d&range=1d`);
-          const data = await res.json();
-          const meta = data.chart.result[0].meta;
-          price = '$' + meta.regularMarketPrice.toFixed(2);
-          change = ((meta.regularMarketPrice - meta.previousClose) / meta.previousClose) * 100;
-          changeStr = (change >= 0 ? '+' : '') + change.toFixed(2) + '%';
-        } catch(e) { price = '—'; changeStr = '—'; }
       }
 
       const colorClass = change === null ? 'neutral' : change >= 0 ? 'positive' : 'negative';
-
       container.innerHTML += `
         <div class="ticker-row">
           <div>
@@ -480,14 +642,23 @@
           </div>
           <div class="ticker-price">
             <div class="price">${price}</div>
-            <div class="change ${colorClass}">${changeStr}</div>
+            <div class="change ${colorClass}">${changeStr} 24h</div>
           </div>
         </div>
       `;
     }
+
+    // ETH position value
+    if (cryptoData.ethereum) {
+      const ethVal = (0.02276 * cryptoData.ethereum.usd).toFixed(2);
+      container.innerHTML += `
+        <div style="margin-top:4px;padding:8px 10px;background:#0d1117;border-radius:6px;border:1px solid #21262d;font-size:11px;color:#8b949e">
+          Position: <strong style="color:#e6edf3">$${ethVal}</strong> · entry ~$300 · net loss ~$172
+        </div>`;
+    }
   }
 
-  // AI News via Hacker News (AI tag) + hardcoded recent Nate B Jones
+  // AI News via Hacker News
   async function loadNews() {
     const container = document.getElementById('news-content');
     try {
@@ -520,26 +691,21 @@
     }
   }
 
-
+  // Kalshi open positions via API
   async function loadKalshi() {
     const el = document.getElementById('kalshi-content');
     if (!el) return;
-    try {
-      // Use Kalshi public market data (no auth needed for market status)
-      const positions = [
-        { ticker: 'KXHIGHLAX-26MAR18-T89', contracts: 10,  cost: 4.60,  desc: 'LA >89°F today' },
-        { ticker: 'KXHIGHLAX-26MAR19-T83', contracts: 25,  cost: 9.37,  desc: 'LA <83°F tomorrow' },
-        { ticker: 'KXHIGHLAX-26MAR19-T90', contracts: 253, cost: 82.35, desc: 'LA >90°F tomorrow' },
-      ];
+    // Static from bot log — bot places trades, we show last known state
+    const positions = [
+      { desc: 'YES LA >83°F Mar 21', contracts: 75, cost: 3.00, settled: false },
+    ];
 
-      let html = '<div class="tickers">';
-      let totalCost = 0, totalPayout = 0;
-
+    let html = '<div class="tickers">';
+    if (positions.length === 0) {
+      html += '<div class="loading">No open positions</div>';
+    } else {
       for (const p of positions) {
-        totalCost += p.cost;
-        totalPayout += p.contracts;
-        const profit = p.contracts - p.cost;
-        const roi = ((profit / p.cost) * 100).toFixed(0);
+        const maxPayout = p.contracts * 0.01; // rough
         html += `
           <div class="ticker-row">
             <div>
@@ -548,25 +714,21 @@
             </div>
             <div class="ticker-price">
               <div class="price">$${p.contracts.toFixed(0)}</div>
-              <div class="change positive">+${roi}% if win</div>
+              <div class="change positive">if YES wins</div>
             </div>
           </div>`;
       }
-
-      const maxProfit = totalPayout - totalCost;
-      html += `</div>
-        <div style="margin-top:10px;padding:8px 10px;background:#0d1117;border-radius:6px;border:1px solid #21262d">
-          <div style="font-size:11px;color:#8b949e">Total invested: <strong style="color:#e6edf3">$${totalCost.toFixed(2)}</strong> · Max payout: <strong style="color:#3fb950">$${totalPayout.toFixed(2)}</strong> · Max profit: <strong style="color:#3fb950">+$${maxProfit.toFixed(2)}</strong></div>
-          <div style="font-size:11px;color:#8b949e;margin-top:4px">Cash remaining: <strong style="color:#e6edf3">$0.28</strong> · Settling: Mar 19-20</div>
-        </div>`;
-      el.innerHTML = html;
-    } catch(e) {
-      el.innerHTML = '<span class="neutral">Failed to load</span>';
     }
+    html += `</div>
+      <div style="margin-top:10px;padding:8px 10px;background:#0d1117;border-radius:6px;border:1px solid #21262d">
+        <div style="font-size:11px;color:#8b949e">Balance: <strong style="color:#e6edf3">$48.03</strong> · Today P&L: <strong style="color:#f85149">-$1.07</strong></div>
+        <div style="font-size:11px;color:#8b949e;margin-top:4px">Reloaded: $50 today · Lost $99 on LA heat (Mar 19-20)</div>
+      </div>`;
+    el.innerHTML = html;
   }
 
   async function loadAll() {
-    await Promise.all([loadWeather(), loadNews(), loadKalshi()]);
+    await Promise.all([loadWeather(), loadTickers(), loadNews(), loadKalshi()]);
     document.getElementById('lastUpdated').textContent = 'Last updated: ' + new Date().toLocaleTimeString('en-US', { timeZone: 'America/Chicago' });
   }
 
@@ -610,7 +772,6 @@
     const updated = filtered.slice(0, 5);
     localStorage.setItem('recentAgents', JSON.stringify(updated));
     renderRecentAgents();
-    // Copy agent name to clipboard
     navigator.clipboard.writeText('Activate agent: ' + name).catch(() => {});
     alert('Agent "' + name + '" copied to clipboard!\n\nPaste into your chat with Leo to activate.');
   }
@@ -630,9 +791,8 @@
     ).join('');
   }
 
-  // Init
   renderRecentAgents();
-
+  drawKalshiChart();
 </script>
 </body>
 </html>
