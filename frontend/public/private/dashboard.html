@@ -271,6 +271,32 @@
     }
     .cat-agents li:hover { background: #1c2128; color: #e6edf3; }
 
+    /* Drag & drop */
+    .card { cursor: default; }
+    .card-title { cursor: grab; user-select: none; }
+    .card-title:active { cursor: grabbing; }
+    .card.sortable-ghost {
+      opacity: 0.4;
+      border: 1px dashed #388bfd;
+      background: #1c2128;
+    }
+    .card.sortable-drag {
+      opacity: 0.95;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+      transform: rotate(1deg);
+    }
+    .reset-btn {
+      background: none;
+      border: 1px solid #21262d;
+      color: #484f58;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .reset-btn:hover { border-color: #484f58; color: #8b949e; }
+
   </style>
 </head>
 <body>
@@ -283,19 +309,20 @@
   <div style="display:flex;align-items:center;gap:12px;">
     <div class="datetime" id="clock"></div>
     <button class="refresh-btn" onclick="loadAll()">↻ Refresh</button>
+    <button class="reset-btn" onclick="resetLayout()" title="Reset card layout">⊞ Reset</button>
   </div>
 </div>
 
 <div class="grid">
 
   <!-- Weather -->
-  <div class="card">
+  <div class="card" data-id="weather">
     <div class="card-title">🌴 Exuma, Bahamas Weather <span style="color:#484f58;font-weight:400;font-size:10px">(traveling · home Mar 26)</span></div>
     <div id="weather-content" class="loading">Loading...</div>
   </div>
 
   <!-- Crypto Tickers -->
-  <div class="card">
+  <div class="card" data-id="markets">
     <div class="card-title">📈 Markets</div>
     <div class="tickers" id="tickers-content">
       <div class="loading">Loading...</div>
@@ -303,7 +330,7 @@
   </div>
 
   <!-- AI News -->
-  <div class="card">
+  <div class="card" data-id="news">
     <div class="card-title">🤖 AI News</div>
     <div class="news-list" id="news-content">
       <div class="loading">Loading...</div>
@@ -311,7 +338,7 @@
   </div>
 
   <!-- Kalshi Bot Status -->
-  <div class="card">
+  <div class="card" data-id="kalshi-bot">
     <div class="card-title">🤖 KalshiBot Status</div>
     <div id="kalshi-bot-content">
       <div class="tickers">
@@ -343,13 +370,13 @@
   </div>
 
   <!-- Kalshi Positions -->
-  <div class="card">
+  <div class="card" data-id="kalshi-positions">
     <div class="card-title">🌦️ Kalshi Open Positions</div>
     <div id="kalshi-content" class="loading">Loading...</div>
   </div>
 
   <!-- Kalshi P&L Chart -->
-  <div class="card full" style="min-height:240px">
+  <div class="card full" data-id="kalshi-chart" style="min-height:240px">
     <div class="card-title" style="display:flex;justify-content:space-between;align-items:center">
       <span>📉 Kalshi Balance History <span style="color:#484f58;font-size:10px;font-weight:400;margin-left:6px">Mar 18 – now · from bot logs</span></span>
       <span style="font-size:11px;color:#8b949e">Started: <strong style="color:#e6edf3">$100</strong> · Current: <strong style="color:#3fb950">$48.03</strong> · Net: <strong style="color:#f85149">-$51.97</strong></span>
@@ -360,7 +387,7 @@
   </div>
 
   <!-- Tasks -->
-  <div class="card">
+  <div class="card" data-id="tasks">
     <div class="card-title">✅ Today's Focus</div>
     <div class="tasks">
       <div class="task-item"><span class="priority p-high">HIGH</span> Monitor KalshiBot — hit insufficient_balance briefly today</div>
@@ -372,7 +399,7 @@
   </div>
 
   <!-- Projects -->
-  <div class="card full">
+  <div class="card full" data-id="projects">
     <div class="card-title">🚀 Projects</div>
     <div class="projects">
       <div class="project-item">
@@ -414,7 +441,7 @@
   </div>
 
   <!-- Agent Skills -->
-  <div class="card full">
+  <div class="card full" data-id="agents">
     <div class="card-title" style="display:flex;justify-content:space-between;align-items:center">
       <span>🎭 Agency Agents <span style="color:#484f58;font-size:10px;font-weight:400;margin-left:6px">173 specialists • syncs daily</span></span>
       <span id="agents-last-used-label" style="font-size:11px;color:#8b949e">Last used</span>
@@ -440,6 +467,7 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
 <script>
   // ── Kalshi P&L Chart ─────────────────────────────────────────────────────
   // Key inflection points extracted from bot.log (sampled ~hourly for clarity)
@@ -793,6 +821,46 @@
 
   renderRecentAgents();
   drawKalshiChart();
+
+  // ── Drag & Drop Layout ────────────────────────────────────────────────────
+  const LAYOUT_KEY = 'dashboard-card-order';
+
+  function saveLayout() {
+    const grid = document.querySelector('.grid');
+    const order = [...grid.children].map(el => el.dataset.id).filter(Boolean);
+    localStorage.setItem(LAYOUT_KEY, JSON.stringify(order));
+  }
+
+  function restoreLayout() {
+    const saved = localStorage.getItem(LAYOUT_KEY);
+    if (!saved) return;
+    try {
+      const order = JSON.parse(saved);
+      const grid = document.querySelector('.grid');
+      const cards = {};
+      [...grid.children].forEach(el => {
+        if (el.dataset.id) cards[el.dataset.id] = el;
+      });
+      order.forEach(id => {
+        if (cards[id]) grid.appendChild(cards[id]);
+      });
+    } catch(e) {}
+  }
+
+  function resetLayout() {
+    localStorage.removeItem(LAYOUT_KEY);
+    location.reload();
+  }
+
+  restoreLayout();
+
+  Sortable.create(document.querySelector('.grid'), {
+    animation: 150,
+    handle: '.card-title',
+    ghostClass: 'sortable-ghost',
+    dragClass: 'sortable-drag',
+    onEnd: saveLayout
+  });
 </script>
 </body>
 </html>
