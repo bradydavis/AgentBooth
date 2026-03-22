@@ -101,11 +101,22 @@ export default function App() {
     const blob = new Blob([audioBytes], { type: `audio/${format || 'mp3'}` })
     const url = URL.createObjectURL(blob)
 
+    const ctx = audioContextRef.current
+    const analyser = ctx.createAnalyser()
+    analyser.fftSize = 256
+    analyserRef.current = analyser
+
     const audio = new Audio(url)
+    const source = ctx.createMediaElementSource(audio)
+    source.connect(analyser)
+    analyser.connect(ctx.destination)
+
     audio.onended = () => {
       URL.revokeObjectURL(url)
+      analyserRef.current = null
       setAgentState('idle')
     }
+
     audio.play().catch(err => {
       console.error('Audio play failed:', err)
       setAgentState('idle')
@@ -165,6 +176,17 @@ export default function App() {
 
   // Tap to toggle recording
   const handleSphereClick = useCallback(() => {
+    // Unlock audio on user gesture
+    if (!audioContextRef.current) {
+      audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)()
+    }
+    if (audioContextRef.current.state === 'suspended') {
+      audioContextRef.current.resume()
+    }
+    // Also unlock with a silent play
+    const silent = new Audio('data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4Ljc2LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAABhgC7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7//////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAAAAAAAAAAAAYYoRwBHAAAAAAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAABhgC7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7u7//////////////////////////////////////////////////////////////////8AAAAATGF2YzU4LjEzAAAAAAAAAAAAAAAAJAAAAAAAAAAAAYYoRwBHAAAAAAAAAAAAAAAAAAAA')
+    silent.play().catch(() => {})
+
     if (agentState === 'idle') {
       startRecording()
     } else if (agentState === 'listening') {
