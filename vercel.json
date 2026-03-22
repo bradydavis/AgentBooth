@@ -1,5 +1,6 @@
 {
   "rewrites": [
+    { "source": "/private/(.*)", "destination": "/private/$1" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
