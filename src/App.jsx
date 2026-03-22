@@ -101,26 +101,15 @@ export default function App() {
     const blob = new Blob([audioBytes], { type: `audio/${format || 'mp3'}` })
     const url = URL.createObjectURL(blob)
 
-    if (!audioContextRef.current) {
-      audioContextRef.current = new (window.AudioContext || window.webkitAudioContext)()
-    }
-    const ctx = audioContextRef.current
-    const analyser = ctx.createAnalyser()
-    analyser.fftSize = 256
-    analyserRef.current = analyser
-
     const audio = new Audio(url)
-    const source = ctx.createMediaElementSource(audio)
-    source.connect(analyser)
-    analyser.connect(ctx.destination)
-
     audio.onended = () => {
       URL.revokeObjectURL(url)
-      analyserRef.current = null
       setAgentState('idle')
     }
-
-    audio.play().catch(console.error)
+    audio.play().catch(err => {
+      console.error('Audio play failed:', err)
+      setAgentState('idle')
+    })
   }, [])
 
   // ── Recording ─────────────────────────────────────────────────────
