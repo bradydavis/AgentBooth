@@ -379,10 +379,21 @@
   <div class="card full" data-id="kalshi-chart" style="min-height:240px">
     <div class="card-title" style="display:flex;justify-content:space-between;align-items:center">
       <span>📉 Kalshi Balance History <span style="color:#484f58;font-size:10px;font-weight:400;margin-left:6px">Mar 18 – now · from bot logs</span></span>
-      <span style="font-size:11px;color:#8b949e">Started: <strong style="color:#e6edf3">$100</strong> · Current: <strong style="color:#3fb950">$48.03</strong> · Net: <strong style="color:#f85149">-$51.97</strong></span>
+      <span style="font-size:11px;color:#8b949e">Started: <strong style="color:#e6edf3">$100</strong> · Current: <strong style="color:#3fb950">$64.68</strong> · Net: <strong style="color:#f85149">-$35.32</strong></span>
     </div>
     <div style="position:relative;height:180px">
       <canvas id="kalshiChart"></canvas>
+    </div>
+  </div>
+
+  <!-- Polymarket Balance Chart -->
+  <div class="card full" data-id="poly-chart" style="min-height:240px">
+    <div class="card-title" style="display:flex;justify-content:space-between;align-items:center">
+      <span>📈 Polymarket Balance History <span style="color:#484f58;font-size:10px;font-weight:400;margin-left:6px">Feb 20 – now · manual + bot</span></span>
+      <span style="font-size:11px;color:#8b949e">Started: <strong style="color:#e6edf3">$300</strong> · Current: <strong style="color:#3fb950">$587.19</strong> · Net: <strong style="color:#3fb950">+$287.19</strong></span>
+    </div>
+    <div style="position:relative;height:180px">
+      <canvas id="polyChart"></canvas>
     </div>
   </div>
 
@@ -420,7 +431,7 @@
         <div class="project-dot dot-active"></div>
         <div>
           <div class="project-name">PolyBot — Polymarket Crypto Betting</div>
-          <div class="project-status">Running ✅ PID 66730 · $382.88 USDC deployed · Sort bug fixed, live trading active</div>
+          <div class="project-status">Running ✅ PID 66730 · $587.19 USDC deployed · Mean reversion + momentum strategies active</div>
         </div>
       </div>
       <div class="project-item">
@@ -486,7 +497,10 @@
     { t: "Mar 20 00:00",  b: 0.28 },
     { t: "Mar 20 13:00",  b: 0.10 },
     { t: "Mar 20 14:15",  b: 49.10,  note: "Reloaded $50 ↑" },
-    { t: "Mar 20 14:18",  b: 48.03,  note: "Now (v4 bot)" },
+    { t: "Mar 20 14:15",  b: 49.10,  note: "Reloaded $50 ↑" },
+    { t: "Mar 20 14:43",  b: 34.20,  note: "Drawdown stop fired" },
+    { t: "Mar 21 settle", b: 64.68,  note: "Positions settled ✅ +$14.68" },
+    { t: "Mar 28 20:25",  b: 64.68,  note: "Bot restarted (40% stop)" },
   ];
 
   function drawKalshiChart() {
@@ -819,8 +833,86 @@
     ).join('');
   }
 
+  // ── Polymarket Balance Chart ──────────────────────────────────────────────
+  const POLY_HISTORY = [
+    { t: "Feb 20",       b: 300.00, note: "Initial deposit" },
+    { t: "Mar 20",       b: 300.00, note: "Bot launched (no trades yet)" },
+    { t: "Mar 21",       b: 300.00 },
+    { t: "Mar 21 eve",   b: 382.88, note: "Texas beats Gonzaga +$82 🏀" },
+    { t: "Mar 22",       b: 382.88 },
+    { t: "Mar 28",       b: 382.88 },
+    { t: "Mar 28 eve",   b: 587.19, note: "Purdue vs Arizona +$204 🏀" },
+  ];
+
+  function drawPolyChart() {
+    const ctx = document.getElementById('polyChart');
+    if (!ctx) return;
+    const labels = POLY_HISTORY.map(p => p.t);
+    const data   = POLY_HISTORY.map(p => p.b);
+
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{
+          data,
+          segment: {
+            borderColor: ctx => ctx.p1.parsed.y >= 300 ? '#3fb950' : '#f85149'
+          },
+          backgroundColor: 'transparent',
+          pointBackgroundColor: data.map((b, i) => POLY_HISTORY[i].note ? '#3fb950' : '#8b949e'),
+          pointRadius: data.map((b, i) => POLY_HISTORY[i].note ? 5 : 2),
+          pointHoverRadius: 6,
+          borderWidth: 2,
+          tension: 0.1,
+          fill: {
+            target: 'origin',
+            above: 'rgba(63,185,80,0.05)',
+            below: 'rgba(248,81,73,0.07)',
+          }
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        animation: { duration: 600 },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: '#161b22',
+            borderColor: '#21262d',
+            borderWidth: 1,
+            titleColor: '#8b949e',
+            bodyColor: '#e6edf3',
+            callbacks: {
+              label: ctx => {
+                const note = POLY_HISTORY[ctx.dataIndex].note;
+                return note
+                  ? [`Balance: $${ctx.parsed.y.toFixed(2)}`, note]
+                  : `Balance: $${ctx.parsed.y.toFixed(2)}`;
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            grid: { color: '#21262d' },
+            ticks: { color: '#484f58', font: { size: 9 }, maxRotation: 35, autoSkip: true, maxTicksLimit: 8 }
+          },
+          y: {
+            grid: { color: '#21262d' },
+            ticks: { color: '#8b949e', font: { size: 10 }, callback: v => '$' + v.toFixed(0) },
+            suggestedMin: 0,
+            suggestedMax: 650
+          }
+        }
+      }
+    });
+  }
+
   renderRecentAgents();
   drawKalshiChart();
+  drawPolyChart();
 
   // ── Drag & Drop Layout ────────────────────────────────────────────────────
   const LAYOUT_KEY = 'dashboard-card-order';
