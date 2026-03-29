@@ -317,8 +317,16 @@
 
   <!-- Weather -->
   <div class="card" data-id="weather">
-    <div class="card-title">🌴 Exuma, Bahamas Weather <span style="color:#484f58;font-weight:400;font-size:10px">(traveling · home Mar 26)</span></div>
+    <div class="card-title">🌤️ Little Rock Weather</div>
     <div id="weather-content" class="loading">Loading...</div>
+  </div>
+
+  <!-- Greers Ferry Lake Level -->
+  <div class="card" data-id="lake-level">
+    <div class="card-title">🚤 Greers Ferry Lake Level</div>
+    <div id="lake-level-content">
+      <div class="loading">Loading...</div>
+    </div>
   </div>
 
   <!-- Crypto Tickers -->
@@ -614,10 +622,10 @@
   setInterval(updateClock, 1000);
   updateClock();
 
-  // Weather — showing Exuma, Bahamas (Brady traveling Mar 19-26)
+  // Weather — Little Rock AR (zip 72223)
   async function loadWeather() {
     try {
-      const res = await fetch('https://wttr.in/Exuma+Bahamas?format=j1');
+      const res = await fetch('https://wttr.in/72223?format=j1');
       const raw = await res.json();
       const d = raw.data || raw;
       const cur = d.current_condition[0];
@@ -769,8 +777,46 @@
     el.innerHTML = html;
   }
 
+  // Greers Ferry Lake Level
+  async function loadLakeLevel() {
+    const el = document.getElementById('lake-level-content');
+    try {
+      const res = await fetch('https://greersferry.uslakes.info/Level/');
+      const text = await res.text();
+      const match = text.match(/([\d]+\.[\d]+)\s*(?:<[^>]+>)?\s*Feet MSL/);
+      const level = match ? parseFloat(match[1]) : null;
+      const fullPool = 461.44;
+      const diff = level ? (level - fullPool).toFixed(2) : null;
+      const pct = level ? Math.max(0, Math.min(100, ((level - 450) / (fullPool - 450)) * 100)).toFixed(0) : null;
+      const launchable = level && level >= 458;
+      const color = launchable ? '#3fb950' : level && level >= 455 ? '#d29922' : '#f85149';
+      const status = launchable ? '✅ Launchable' : '🚫 Too Low';
+
+      if (level) {
+        el.innerHTML = `
+          <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:12px">
+            <div style="font-size:32px;font-weight:700;color:${color}">${level}</div>
+            <div style="font-size:13px;color:#8b949e">ft MSL</div>
+          </div>
+          <div style="background:#0d1117;border-radius:8px;height:8px;margin-bottom:10px;overflow:hidden">
+            <div style="height:100%;width:${pct}%;background:${color};border-radius:8px;transition:width .4s"></div>
+          </div>
+          <div style="font-size:12px;color:#8b949e;margin-bottom:6px">
+            <span style="color:${color};font-weight:600">${diff > 0 ? '+' : ''}${diff} ft</span> vs full pool (${fullPool} ft)
+          </div>
+          <div style="font-size:13px;font-weight:600;color:${color}">${status}</div>
+          <div style="font-size:11px;color:#484f58;margin-top:6px">Corps drawdown for turbine repair · Target: 459 ft</div>
+        `;
+      } else {
+        el.innerHTML = `<div style="color:#8b949e;font-size:13px">Unable to load level data</div>`;
+      }
+    } catch(e) {
+      el.innerHTML = `<div style="color:#8b949e;font-size:13px">Unable to load — try again</div>`;
+    }
+  }
+
   async function loadAll() {
-    await Promise.all([loadWeather(), loadTickers(), loadNews(), loadKalshi()]);
+    await Promise.all([loadWeather(), loadTickers(), loadNews(), loadKalshi(), loadLakeLevel()]);
     document.getElementById('lastUpdated').textContent = 'Last updated: ' + new Date().toLocaleTimeString('en-US', { timeZone: 'America/Chicago' });
   }
 
