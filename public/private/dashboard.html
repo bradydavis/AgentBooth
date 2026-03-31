@@ -387,7 +387,7 @@
   <div class="card full" data-id="kalshi-chart" style="min-height:240px">
     <div class="card-title" style="display:flex;justify-content:space-between;align-items:center">
       <span>📉 Kalshi Balance History <span style="color:#484f58;font-size:10px;font-weight:400;margin-left:6px">Mar 18 – now · from bot logs</span></span>
-      <span style="font-size:11px;color:#8b949e">Started: <strong style="color:#e6edf3">$100</strong> · Current: <strong style="color:#3fb950">$64.68</strong> · Net: <strong style="color:#f85149">-$35.32</strong></span>
+      <span style="font-size:11px;color:#8b949e">Started: <strong style="color:#e6edf3">$100</strong> · Current: <strong style="color:#3fb950">$49.06</strong> · Net: <strong style="color:#f85149">-$50.94</strong></span>
     </div>
     <div style="position:relative;height:180px">
       <canvas id="kalshiChart"></canvas>
@@ -509,6 +509,9 @@
     { t: "Mar 20 14:43",  b: 34.20,  note: "Drawdown stop fired" },
     { t: "Mar 21 settle", b: 64.68,  note: "Positions settled ✅ +$14.68" },
     { t: "Mar 28 20:25",  b: 64.68,  note: "Bot restarted (40% stop)" },
+    { t: "Mar 28 20:52",  b: 51.84,  note: "Daily loss limit hit (-$15), bot stopped" },
+    { t: "Mar 29 01:50",  b: 49.06,  note: "Mar 29 fills settled" },
+    { t: "Mar 31 09:46",  b: 49.06,  note: "Today — bot restarting now" },
   ];
 
   function drawKalshiChart() {
