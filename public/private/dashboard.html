@@ -780,41 +780,35 @@
     el.innerHTML = html;
   }
 
-  // Greers Ferry Lake Level
+  // Greers Ferry Lake Level — reads from lake-level.json (updated by weekly cron)
   async function loadLakeLevel() {
     const el = document.getElementById('lake-level-content');
     try {
-      const res = await fetch('https://greersferry.uslakes.info/Level/');
-      const text = await res.text();
-      const match = text.match(/([\d]+\.[\d]+)\s*(?:<[^>]+>)?\s*Feet MSL/);
-      const level = match ? parseFloat(match[1]) : null;
-      const fullPool = 461.44;
-      const diff = level ? (level - fullPool).toFixed(2) : null;
-      const pct = level ? Math.max(0, Math.min(100, ((level - 450) / (fullPool - 450)) * 100)).toFixed(0) : null;
-      const launchable = level && level >= 458;
-      const color = launchable ? '#3fb950' : level && level >= 455 ? '#d29922' : '#f85149';
-      const status = launchable ? '✅ Launchable' : '🚫 Too Low';
-
-      if (level) {
-        el.innerHTML = `
-          <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:12px">
-            <div style="font-size:32px;font-weight:700;color:${color}">${level}</div>
-            <div style="font-size:13px;color:#8b949e">ft MSL</div>
-          </div>
-          <div style="background:#0d1117;border-radius:8px;height:8px;margin-bottom:10px;overflow:hidden">
-            <div style="height:100%;width:${pct}%;background:${color};border-radius:8px;transition:width .4s"></div>
-          </div>
-          <div style="font-size:12px;color:#8b949e;margin-bottom:6px">
-            <span style="color:${color};font-weight:600">${diff > 0 ? '+' : ''}${diff} ft</span> vs full pool (${fullPool} ft)
-          </div>
-          <div style="font-size:13px;font-weight:600;color:${color}">${status}</div>
-          <div style="font-size:11px;color:#484f58;margin-top:6px">Corps drawdown for turbine repair · Target: 459 ft</div>
-        `;
-      } else {
-        el.innerHTML = `<div style="color:#8b949e;font-size:13px">Unable to load level data</div>`;
-      }
+      const res = await fetch('/private/lake-level.json?t=' + Date.now());
+      const data = await res.json();
+      const level = data.level;
+      const fullPool = data.fullPool || 461.44;
+      const diff = (level - fullPool).toFixed(2);
+      const pct = Math.max(0, Math.min(100, ((level - 450) / (fullPool - 450)) * 100)).toFixed(0);
+      const launchable = level >= 458;
+      const color = launchable ? '#3fb950' : level >= 455 ? '#d29922' : '#f85149';
+      const status = launchable ? '✅ Launchable' : '🚫 Too Low to Launch';
+      el.innerHTML = `
+        <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:12px">
+          <div style="font-size:32px;font-weight:700;color:${color}">${level}</div>
+          <div style="font-size:13px;color:#8b949e">ft MSL</div>
+        </div>
+        <div style="background:#0d1117;border-radius:8px;height:8px;margin-bottom:10px;overflow:hidden">
+          <div style="height:100%;width:${pct}%;background:${color};border-radius:8px;transition:width .4s"></div>
+        </div>
+        <div style="font-size:12px;color:#8b949e;margin-bottom:6px">
+          <span style="color:${color};font-weight:600">${diff > 0 ? '+' : ''}${diff} ft</span> vs full pool (${fullPool} ft)
+        </div>
+        <div style="font-size:13px;font-weight:600;color:${color}">${status}</div>
+        <div style="font-size:11px;color:#484f58;margin-top:6px">${data.note || ''} · Updated ${data.updatedAt || 'recently'}</div>
+      `;
     } catch(e) {
-      el.innerHTML = `<div style="color:#8b949e;font-size:13px">Unable to load — try again</div>`;
+      el.innerHTML = `<div style="color:#8b949e;font-size:13px">Unable to load level data</div>`;
     }
   }
 
