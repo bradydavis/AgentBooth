@@ -784,10 +784,15 @@
   async function loadLakeLevel() {
     const el = document.getElementById('lake-level-content');
     try {
-      const res = await fetch('/private/lake-level.json?t=' + Date.now());
-      const data = await res.json();
-      const level = data.level;
-      const fullPool = data.fullPool || 461.44;
+      const proxy = 'https://api.allorigins.win/get?url=' + encodeURIComponent('https://greersferry.uslakes.info/Level/');
+      const res = await fetch(proxy);
+      const json = await res.json();
+      const html = json.contents || '';
+      // Level is in a large colored div e.g. >455.46</div>
+      const match = html.match(/>(\d{3}\.\d{2})<\/div>/);
+      const level = match ? parseFloat(match[1]) : null;
+      if (!level) throw new Error('parse failed');
+      const fullPool = 461.44;
       const diff = (level - fullPool).toFixed(2);
       const pct = Math.max(0, Math.min(100, ((level - 450) / (fullPool - 450)) * 100)).toFixed(0);
       const launchable = level >= 458;
@@ -805,7 +810,7 @@
           <span style="color:${color};font-weight:600">${diff > 0 ? '+' : ''}${diff} ft</span> vs full pool (${fullPool} ft)
         </div>
         <div style="font-size:13px;font-weight:600;color:${color}">${status}</div>
-        <div style="font-size:11px;color:#484f58;margin-top:6px">${data.note || ''} · Updated ${data.updatedAt || 'recently'}</div>
+        <div style="font-size:11px;color:#484f58;margin-top:6px">Corps drawdown for turbine repair · Target: 459 ft</div>
       `;
     } catch(e) {
       el.innerHTML = `<div style="color:#8b949e;font-size:13px">Unable to load level data</div>`;
