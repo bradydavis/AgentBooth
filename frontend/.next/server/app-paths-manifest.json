@@ -1,0 +1,16 @@
+{
+  "/_not-found/page": "app/_not-found/page.js",
+  "/(auth)/sign-in/[[...sign-in]]/page": "app/(auth)/sign-in/[[...sign-in]]/page.js",
+  "/(auth)/sign-up/[[...sign-up]]/page": "app/(auth)/sign-up/[[...sign-up]]/page.js",
+  "/api/booths/route": "app/api/booths/route.js",
+  "/api/calls/route": "app/api/calls/route.js",
+  "/api/keys/route": "app/api/keys/route.js",
+  "/api/stripe/checkout/route": "app/api/stripe/checkout/route.js",
+  "/api/webhooks/clerk/route": "app/api/webhooks/clerk/route.js",
+  "/page": "app/page.js",
+  "/api/stripe/webhook/route": "app/api/stripe/webhook/route.js",
+  "/(dashboard)/dashboard/history/page": "app/(dashboard)/dashboard/history/page.js",
+  "/(dashboard)/dashboard/settings/page": "app/(dashboard)/dashboard/settings/page.js",
+  "/(dashboard)/upgrade/page": "app/(dashboard)/upgrade/page.js",
+  "/(dashboard)/dashboard/page": "app/(dashboard)/dashboard/page.js"
+}
